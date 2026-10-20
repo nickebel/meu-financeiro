@@ -27,7 +27,7 @@ async function main() {
   }
   const indexPath = path.join(out, "index.html");
   let html = await fs.readFile(indexPath, "utf8");
-  html = html.replace('<meta name="apple-mobile-web-app-title" content="Meu Financeiro">', '<meta name="apple-mobile-web-app-title" content="Meu Financeiro">\\n<meta name="mf-native-shell" content="true">');
+  html = html.replace('<meta name="apple-mobile-web-app-title" content="Meu Financeiro">', '<meta name="apple-mobile-web-app-title" content="Meu Financeiro">\n<meta name="mf-native-shell" content="true">');
   const remoteSdk = '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>';
   if (html.includes(remoteSdk)) html = html.replace(remoteSdk, '<script src="supabase.min.js"></script>');
   if (!html.includes('src="supabase.min.js"')) throw new Error("Referência ao SDK Supabase não localizada.");
