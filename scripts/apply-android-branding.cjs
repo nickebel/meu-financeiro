@@ -7,7 +7,10 @@ const res = path.join(root, "android", "app", "src", "main", "res");
 const source = path.join(root, "app-icon.svg");
 const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
 
-// O foreground usa o mesmo desenho do favicon, em escala segura para ícones adaptativos Android.
+// Foreground transparente baseado no mesmo símbolo do favicon do site.
+// É gerado em TODAS as densidades: o Android escolhe a versão mais próxima
+// da tela e, se uma densidade ficar sem este arquivo, pode usar o ícone
+// padrão azul que o Capacitor cria.
 const foregroundSvg = Buffer.from(
   '<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">' +
   '<path d="M227 154 L263 123 L294 144 L331 102" fill="none" stroke="#bcebd2" stroke-width="18.2" stroke-linecap="round" stroke-linejoin="round"/>' +
@@ -22,12 +25,13 @@ async function main() {
     await fs.mkdir(folder, { recursive: true });
     await sharp(source).resize(size, size).png().toFile(path.join(folder, "ic_launcher.png"));
     await sharp(source).resize(size, size).png().toFile(path.join(folder, "ic_launcher_round.png"));
+    // Esta é a imagem usada pelo ícone adaptativo do Android.
+    await sharp(foregroundSvg).resize(size, size).png().toFile(path.join(folder, "ic_launcher_foreground.png"));
   }
-  const highDensity = path.join(res, "mipmap-xxxhdpi");
-  await sharp(foregroundSvg).png().toFile(path.join(highDensity, "ic_launcher_foreground.png"));
+
   const values = path.join(res, "values");
   await fs.mkdir(values, { recursive: true });
-  // Capacitor já cria o recurso de fundo; sobrescreve o arquivo existente em vez de duplicar.
+  // Capacitor já cria este recurso; sobrescrever evita recursos duplicados.
   const backgroundPath = path.join(values, "ic_launcher_background.xml");
   const backgroundXml = '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#328266</color></resources>\n';
   await fs.writeFile(backgroundPath, backgroundXml, "utf8");
@@ -41,6 +45,6 @@ async function main() {
     '</adaptive-icon>\n';
   await fs.writeFile(path.join(adaptiveFolder, "ic_launcher.xml"), adaptive, "utf8");
   await fs.writeFile(path.join(adaptiveFolder, "ic_launcher_round.xml"), adaptive, "utf8");
-  console.log("Ícone do site aplicado ao projeto Android.");
+  console.log("Ícones adaptativos do Android aplicados com o símbolo do favicon em todas as densidades.");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
