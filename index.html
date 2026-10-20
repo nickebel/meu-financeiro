@@ -7,7 +7,7 @@
 <link rel="icon" href="favicon.svg?v=20261020-1" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261020-9">
+<link rel="stylesheet" href="style.css?v=20261020-10">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="intro-critical-css">
@@ -223,11 +223,12 @@
 <div id="authScreen" class="auth-screen">
   <section class="auth-card">
     <div class="brand-mark">m.</div><p class="eyebrow">SUAS FINANÇAS, COM CALMA</p>
-    <h1>Cuide bem do<br><span>seu dinheiro.</span></h1>
-    <p class="muted">Um lugar simples para entender seu dinheiro e planejar os próximos passos.</p>
+    <h1 id="authTitle">Cuide bem do<br><span>seu dinheiro.</span></h1>
+    <p class="muted" id="authSubtitle">Um lugar simples para entender seu dinheiro e planejar os próximos passos.</p>
     <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="voce@email.com"></div>
     <div class="field password-field"><label for="password">Senha</label><div class="password-input-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="Mínimo de 8 caracteres"><button id="togglePassword" class="password-toggle" type="button" aria-label="Mostrar senha" aria-pressed="false" title="Mostrar senha"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
-    <button id="signInBtn" class="btn primary full">Entrar</button><button id="signUpBtn" class="btn secondary full">Criar minha conta</button>
+    <div id="confirmPasswordField" class="field hidden"><label for="confirmPassword">Confirmar senha</label><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Digite a senha novamente"></div>
+    <button id="signInBtn" class="btn primary full" type="button">Entrar</button><button id="signUpBtn" class="btn secondary full" type="button">Criar minha conta</button><button id="backToLoginBtn" class="text-btn hidden" type="button">Já tenho conta? Entrar</button>
     <button id="resetBtn" class="text-btn">Esqueci minha senha</button>
     <div class="auth-divider"><span>ou</span></div>
     <button id="demoBtn" class="btn demo-btn full" type="button">Ver demonstração sem conta ↗</button>
@@ -328,5 +329,5 @@
 </script>
 
 <script src="config.js"></script>
-<script src="app.js?v=20261020-5"></script>
+<script src="app.js?v=20261020-6"></script>
 </body></html>
