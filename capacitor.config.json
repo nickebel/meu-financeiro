@@ -1,0 +1,12 @@
+{
+  "appId": "com.nickebel.meufinanceiro",
+  "appName": "Meu Financeiro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
