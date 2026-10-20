@@ -2,12 +2,16 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f8f6ef"><meta name="description" content="Seu controle financeiro pessoal, simples e privado.">
+<meta name="theme-color" content="#328266">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meu Financeiro">
+<link rel="manifest" href="manifest.webmanifest"><meta name="description" content="Seu controle financeiro pessoal, simples e privado.">
 <title>Meu Financeiro</title>
 <link rel="icon" href="favicon.svg?v=20261020-1" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261020-11">
+<link rel="stylesheet" href="style.css?v=20261020-12">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="intro-critical-css">
@@ -325,6 +329,11 @@
     <div class="auth-divider"><span>ou</span></div>
     <button id="demoBtn" class="btn demo-btn full" type="button">Ver demonstração sem conta ↗</button>
     <p class="tiny muted demo-caption">Entre para salvar seus próprios dados. A demonstração usa informações fictícias.</p>
+    <button id="installAppBtn" class="btn secondary full install-app-btn" type="button">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M12 6v7m-3-3 3 3 3-3"/></svg>
+      Instalar como aplicativo
+    </button>
+    <p id="installHelp" class="tiny muted install-help hidden">Android: abra o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”. iPhone/iPad: no Safari, toque em Compartilhar e depois “Adicionar à Tela de Início”. No computador, procure “Instalar Meu Financeiro” no menu do navegador.</p>
     <p id="authMessage" class="message" role="status"></p>
     <p class="tiny muted">Seus dados são privados e vinculados à sua conta.</p>
   </section>
@@ -422,4 +431,5 @@
 
 <script src="config.js"></script>
 <script src="app.js?v=20261020-8"></script>
+<script src="pwa.js?v=20261020-1"></script>
 </body></html>
