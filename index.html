@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261020-12">
+<link rel="stylesheet" href="style.css?v=20261020-13">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="intro-critical-css">
@@ -354,7 +354,7 @@
     <div class="sidebar-bottom"><div class="privacy-note"><span class="privacy-dot"></span><div><strong>Espaço privado</strong><small>Seus dados, só seus.</small></div></div><button id="signOutBtn" class="nav-item signout"><span>↪</span> Sair da conta</button></div>
   </aside>
   <main class="main">
-    <header class="topbar"><button id="menuBtn" class="icon-btn mobile-menu" aria-label="Abrir menu">☰</button><div><p class="eyebrow" id="todayLabel">SEU RESUMO FINANCEIRO</p><h2 id="pageTitle">Visão geral</h2></div><div class="top-actions"><span class="avatar" id="avatar">M</span><span id="userEmail" class="user-email"></span></div></header>
+    <header class="topbar"><button id="menuBtn" class="icon-btn mobile-menu" aria-label="Abrir menu">☰</button><div><p class="eyebrow" id="todayLabel">SEU RESUMO FINANCEIRO</p><h2 id="pageTitle">Visão geral</h2></div><div class="top-actions"><span class="avatar" id="avatar">M</span><span id="userEmail" class="user-email"></span><span id="syncStatus" class="sync-status hidden" role="status" aria-live="polite"></span></div></header>
     <div class="content">
       <section id="dashboardPage" class="page">
         <div class="welcome-row"><div><h3>Olá! Vamos organizar as coisas.</h3><p class="muted">Um passo de cada vez já faz diferença.</p></div><button class="btn primary" id="quickAddBtn">＋ Novo lançamento</button></div>
@@ -431,6 +431,7 @@
 </script>
 
 <script src="config.js"></script>
-<script src="app.js?v=20261020-8"></script>
-<script src="pwa.js?v=20261020-1"></script>
+<script src="offline-store.js?v=20261020-1"></script>
+<script src="app.js?v=20261020-9"></script>
+<script src="pwa.js?v=20261020-2"></script>
 </body></html>
