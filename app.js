@@ -1,6 +1,6 @@
 const C=window.APP_CONFIG||{},$=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(n||0)),day=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")},month=()=>day().slice(0,7),df=s=>s?new Date(s+"T12:00:00").toLocaleDateString("pt-BR"):"—",esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cats=["Moradia","Alimentação","Transporte","Saúde","Educação","Lazer","Compras","Assinaturas","Salário","Freelance","Investimentos","Outros"],titles={dashboard:"Visão geral",transactions:"Lançamentos",cards:"Cartões e parcelas",bills:"Contas a pagar",goals:"Metas de economia",reports:"Relatórios"},tables={transaction:"transactions",card:"cards",installment:"installments",bill:"bills",goal:"goals"};
-let db,user,rows={transactions:[],cards:[],installments:[],bills:[],goals:[]},edit=null,kind=null;
+let db,user,rows={transactions:[],cards:[],installments:[],bills:[],goals:[]},edit=null,kind=null,authMode="in";
 function msg(id,s){$(id).textContent=s||""}function toast(s,err=false){let e=$("toast");e.textContent=s;e.classList.toggle("error",err);e.classList.remove("hidden");setTimeout(()=>e.classList.add("hidden"),3500)}
 function init(){
  if($("monthFilter"))$("monthFilter").value=month();
@@ -21,7 +21,9 @@ function init(){
  if(configured)db=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
  else {msg("authMessage","Você pode experimentar a demonstração sem criar uma conta.");["signInBtn","signUpBtn","resetBtn"].forEach(id=>$(id).disabled=true)}
  if(db){
-  $("signInBtn").onclick=()=>auth("in");$("signUpBtn").onclick=()=>auth("up");
+  $("signInBtn").onclick=()=>auth("in");
+  $("signUpBtn").onclick=()=>authMode==="up"?auth("up"):setAuthMode("up");
+  $("backToLoginBtn").onclick=()=>setAuthMode("in");
   $("resetBtn").onclick=async()=>{let email=$("email").value.trim();if(!email)return msg("authMessage","Informe seu e-mail.");let r=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});msg("authMessage",r.error?.message||"Se o e-mail estiver cadastrado, você receberá instruções.")};
   db.auth.onAuthStateChange((_e,s)=>setTimeout(()=>s?.user?enter(s.user):leave(),0));
   db.auth.getSession().then(({data:{session}})=>session?.user?enter(session.user):leave());
@@ -40,7 +42,53 @@ function init(){
  $("modalBackdrop").onclick=e=>{if(e.target===$("modalBackdrop"))close()};
  $("editorForm").onsubmit=save;document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
 }
-async function auth(mode){let email=$("email").value.trim(),password=$("password").value;if(!email||!password)return msg("authMessage","Preencha e-mail e senha.");if(password.length<8)return msg("authMessage","Use uma senha com pelo menos 8 caracteres.");let b=$(mode==="in"?"signInBtn":"signUpBtn");b.disabled=true;let r=mode==="in"?await db.auth.signInWithPassword({email,password}):await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});b.disabled=false;if(r.error)msg("authMessage",/invalid login credentials/i.test(r.error.message)?"E-mail ou senha incorretos.":r.error.message);else if(mode==="up"&&!r.data.session)msg("authMessage","Conta criada! Confira seu e-mail para confirmar o cadastro.");else msg("authMessage","Entrando…")}
+function setAuthMode(mode){
+ authMode=mode;
+ const registering=mode==="up";
+ $("authTitle").innerHTML=registering?'Crie sua conta<br><span>organize seu futuro.</span>':'Cuide bem do<br><span>seu dinheiro.</span>';
+ $("authSubtitle").textContent=registering
+  ?"Cadastre-se para guardar seus dados e acessar seu espaço financeiro em outros dispositivos."
+  :"Um lugar simples para entender seu dinheiro e planejar os próximos passos.";
+ $("signInBtn").classList.toggle("hidden",registering);
+ $("signUpBtn").className="btn "+(registering?"primary":"secondary")+" full";
+ $("signUpBtn").textContent=registering?"Criar conta":"Criar minha conta";
+ $("confirmPasswordField").classList.toggle("hidden",!registering);
+ $("backToLoginBtn").classList.toggle("hidden",!registering);
+ $("resetBtn").classList.toggle("hidden",registering);
+ msg("authMessage","");
+}
+async function auth(mode){
+ let email=$("email").value.trim(),password=$("password").value;
+ if(!email||!password)return msg("authMessage","Preencha e-mail e senha.");
+ if(password.length<8)return msg("authMessage","Use uma senha com pelo menos 8 caracteres.");
+ if(mode==="up"&&password!==$("confirmPassword").value)return msg("authMessage","As senhas não coincidem. Confira e tente novamente.");
+ let b=$(mode==="in"?"signInBtn":"signUpBtn");
+ b.disabled=true;
+ try{
+  let r=mode==="in"
+   ?await db.auth.signInWithPassword({email,password})
+   :await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+  if(r.error){
+   const raw=r.error.message||"";
+   let friendly=/invalid login credentials/i.test(raw)?"E-mail ou senha incorretos."
+    :/user already registered|already registered/i.test(raw)?"Este e-mail já possui uma conta. Entre ou use a recuperação de senha."
+    :/password should be at least|weak password/i.test(raw)?"A senha é fraca. Use uma senha com pelo menos 8 caracteres."
+    :/email rate limit|rate limit/i.test(raw)?"Muitas tentativas em pouco tempo. Aguarde um pouco e tente novamente."
+    :raw;
+   msg("authMessage",friendly);
+  }else if(mode==="up"&&!r.data.session){
+   setAuthMode("in");
+   $("password").value="";
+   if($("confirmPassword"))$("confirmPassword").value="";
+   msg("authMessage","Cadastro iniciado! Confira seu e-mail para confirmar a conta e depois entre.");
+  }else msg("authMessage","Entrando…");
+ }catch(err){
+  console.error("Erro de autenticação:",err);
+  msg("authMessage","Não foi possível conectar ao Supabase. Verifique sua conexão e tente novamente.");
+ }finally{
+  b.disabled=false;
+ }
+}
 function leave(){document.body.classList.remove("demo-mode");$("signOutBtn").textContent="↪ Sair da conta";$("app").classList.add("hidden");$("authScreen").classList.remove("hidden")}
 function enterDemo(){user=null;document.body.classList.add("demo-mode");$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("userEmail").textContent="Modo demonstração · dados fictícios";$("avatar").textContent="D";$("signOutBtn").textContent="↩ Sair da demonstração";$("todayLabel").textContent="CONHEÇA SEU ESPAÇO FINANCEIRO";let m=month(),d=n=>m+"-"+String(n).padStart(2,"0");rows={transactions:[{id:"d1",type:"income",description:"Salário",amount:3200,date:d(5),category:"Salário"},{id:"d2",type:"expense",description:"Compras do mercado",amount:286.45,date:d(7),category:"Alimentação"},{id:"d3",type:"expense",description:"Conta de energia",amount:148.9,date:d(10),category:"Moradia"},{id:"d4",type:"expense",description:"Transporte",amount:95,date:d(12),category:"Transporte"},{id:"d5",type:"expense",description:"Assinaturas",amount:39.9,date:d(15),category:"Assinaturas"},{id:"d6",type:"income",description:"Trabalho extra",amount:450,date:d(16),category:"Freelance"}],cards:[{id:"c1",name:"Cartão principal",bank:"Nubank",network:"Mastercard",last_four:"4821",limit_amount:2500,closing_day:20,due_day:28}],installments:[{id:"i1",description:"Fone de ouvido",card_id:"c1",total_amount:360,installments_count:6,paid_installments:2,purchase_date:d(3)}],bills:[{id:"b1",name:"Internet",amount:99.9,due_date:d(22),paid:false,category:"Internet"},{id:"b2",name:"Energia elétrica",amount:148.9,due_date:d(10),paid:false,category:"Energia"},{id:"b3",name:"Streaming",amount:34.9,due_date:d(25),paid:true,category:"Assinatura"}],goals:[{id:"g1",name:"Reserva de emergência",target_amount:5000,saved_amount:1750,target_date:null},{id:"g2",name:"Viagem dos sonhos",target_amount:2500,saved_amount:620,target_date:d(30)}]};$("monthFilter").value=m;$("transactionSearch").value="";$("typeFilter").value="";render();go("dashboard") }
 async function enter(u){user=u;$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("userEmail").textContent=u.email||"";$("avatar").textContent=(u.email||"M")[0].toUpperCase();$("todayLabel").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();await load()}
