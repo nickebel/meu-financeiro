@@ -39,10 +39,22 @@ function init(){
   $("signUpBtn").onclick=()=>authMode==="up"?auth("up"):setAuthMode("up");
   $("backToLoginBtn").onclick=()=>setAuthMode("in");
   $("resetBtn").onclick=async()=>{let email=$("email").value.trim();if(!email)return msg("authMessage","Informe seu e-mail.");let r=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});msg("authMessage",r.error?.message||"Se o e-mail estiver cadastrado, você receberá instruções.")};
-  db.auth.onAuthStateChange((_e,s)=>setTimeout(()=>s?.user?enter(s.user):leave(),0));
-  db.auth.getSession().then(({data:{session}})=>session?.user?enter(session.user):leave());
+  db.auth.onAuthStateChange((_e,s)=>setTimeout(()=>{
+   if(s?.user)enter(s.user);
+   else if(!navigator.onLine)restoreOfflineSession();
+   else leave();
+  },0));
+  db.auth.getSession().then(({data:{session}})=>{
+   if(session?.user)enter(session.user);
+   else if(!navigator.onLine)restoreOfflineSession();
+   else leave();
+  }).catch(()=>restoreOfflineSession());
  }
- $("signOutBtn").onclick=()=>document.body.classList.contains("demo-mode")?leave():db?.auth.signOut();
+ $("signOutBtn").onclick=()=>{
+  if(document.body.classList.contains("demo-mode")){leave();return}
+  if(window.FinanceOffline)FinanceOffline.clearRememberedUser();
+  db?.auth.signOut();
+};
  $("navigation").onclick=e=>{let b=e.target.closest("[data-page]");if(b)go(b.dataset.page)};
  document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
  $("menuBtn").onclick=()=>$("app").querySelector(".sidebar").classList.toggle("open");$("monthFilter").onchange=render;
@@ -55,6 +67,10 @@ function init(){
  $("closeModalBtn").onclick=$("cancelModalBtn").onclick=close;
  $("modalBackdrop").onclick=e=>{if(e.target===$("modalBackdrop"))close()};
  $("editorForm").onsubmit=save;document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+ window.addEventListener("online",handleNetworkOnline);
+ window.addEventListener("offline",()=>refreshSyncStatus());
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&navigator.onLine&&user&&!user.offlineOnly)load()});
+ window.addEventListener("finance-sync-state",()=>refreshSyncStatus());
 }
 function setAuthMode(mode){
  authMode=mode;
@@ -103,11 +119,104 @@ async function auth(mode){
   b.disabled=false;
  }
 }
-function leave(){document.body.classList.remove("demo-mode");$("signOutBtn").textContent="↪ Sair da conta";$("app").classList.add("hidden");$("authScreen").classList.remove("hidden")}
+function leave(){
+ document.body.classList.remove("demo-mode");
+ user=null;
+ $("signOutBtn").textContent="↪ Sair da conta";
+ $("app").classList.add("hidden");
+ $("authScreen").classList.remove("hidden");
+ const status=$("syncStatus");if(status)status.classList.add("hidden");
+}
+async function restoreOfflineSession(){
+ if(navigator.onLine||!window.FinanceOffline)return;
+ const cached=FinanceOffline.rememberedUser();
+ if(cached&&cached.id)await enterOffline(cached);
+}
+async function enterOffline(cached){
+ if(!cached||!cached.id||!window.FinanceOffline)return;
+ user={id:cached.id,email:cached.email||"",offlineOnly:true};
+ document.body.classList.remove("demo-mode");
+ $("authScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("userEmail").textContent=(user.email||"Conta salva")+" · modo offline";
+ $("avatar").textContent=(user.email||"M")[0].toUpperCase();
+ $("todayLabel").textContent="MODO OFFLINE · SALVANDO NESTE DISPOSITIVO";
+ $("signOutBtn").textContent="↪ Sair da conta";
+ await load();
+ refreshSyncStatus();
+}
+async function handleNetworkOnline(){
+ if(!user){refreshSyncStatus();return}
+ if(user.offlineOnly){
+  try{
+   const result=await db?.auth.getSession();
+   if(result?.data?.session?.user){await enter(result.data.session.user);return}
+  }catch(_){}
+  toast("Internet voltou. Entre na sua conta para sincronizar as alterações.",true);
+  refreshSyncStatus();
+  return;
+ }
+ if(user.id&&db&&window.FinanceOffline){
+  try{
+   const result=await FinanceOffline.sync(user.id,db);
+   rows=result.rows||rows;
+   render();
+   refreshSyncStatus();
+   if(result.pendingCount===0)toast("Seus dados estão sincronizados.");
+   else toast("Há alterações aguardando sincronização.",true);
+  }catch(error){console.warn("Sincronização:",error);refreshSyncStatus()}
+ }
+}
+async function refreshSyncStatus(){
+ const badge=$("syncStatus");
+ if(!badge)return;
+ if(!user||document.body.classList.contains("demo-mode")){badge.classList.add("hidden");return}
+ badge.classList.remove("hidden");
+ const onlineNow=navigator.onLine;
+ let status={online:onlineNow,pendingCount:0,lastError:null};
+ if(window.FinanceOffline)status=await FinanceOffline.getStatus(user.id);
+ badge.classList.toggle("is-offline",!onlineNow);
+ badge.classList.toggle("has-pending",status.pendingCount>0||Boolean(status.lastError));
+ badge.title=status.lastError||"";
+ if(!onlineNow)badge.textContent="● Offline · salvo neste aparelho";
+ else if(user.offlineOnly)badge.textContent="● Entre para sincronizar";
+ else if(status.lastError)badge.textContent="● Sincronização pendente";
+ else if(status.pendingCount>0)badge.textContent="● "+status.pendingCount+" alteração(ões) pendente(s)";
+ else badge.textContent="● Sincronizado";
+}
 function enterDemo(){user=null;document.body.classList.add("demo-mode");$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("userEmail").textContent="Modo demonstração · dados fictícios";$("avatar").textContent="D";$("signOutBtn").textContent="↩ Sair da demonstração";$("todayLabel").textContent="CONHEÇA SEU ESPAÇO FINANCEIRO";let m=month(),d=n=>m+"-"+String(n).padStart(2,"0");rows={transactions:[{id:"d1",type:"income",description:"Salário",amount:3200,date:d(5),category:"Salário"},{id:"d2",type:"expense",description:"Compras do mercado",amount:286.45,date:d(7),category:"Alimentação"},{id:"d3",type:"expense",description:"Conta de energia",amount:148.9,date:d(10),category:"Moradia"},{id:"d4",type:"expense",description:"Transporte",amount:95,date:d(12),category:"Transporte"},{id:"d5",type:"expense",description:"Assinaturas",amount:39.9,date:d(15),category:"Assinaturas"},{id:"d6",type:"income",description:"Trabalho extra",amount:450,date:d(16),category:"Freelance"}],cards:[{id:"c1",name:"Cartão principal",bank:"Nubank",network:"Mastercard",last_four:"4821",limit_amount:2500,closing_day:20,due_day:28}],installments:[{id:"i1",description:"Fone de ouvido",card_id:"c1",total_amount:360,installments_count:6,paid_installments:2,purchase_date:d(3)}],bills:[{id:"b1",name:"Internet",amount:99.9,due_date:d(22),paid:false,category:"Internet"},{id:"b2",name:"Energia elétrica",amount:148.9,due_date:d(10),paid:false,category:"Energia"},{id:"b3",name:"Streaming",amount:34.9,due_date:d(25),paid:true,category:"Assinatura"}],goals:[{id:"g1",name:"Reserva de emergência",target_amount:5000,saved_amount:1750,target_date:null},{id:"g2",name:"Viagem dos sonhos",target_amount:2500,saved_amount:620,target_date:d(30)}]};$("monthFilter").value=m;$("transactionSearch").value="";$("typeFilter").value="";render();go("dashboard") }
-async function enter(u){user=u;$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("userEmail").textContent=u.email||"";$("avatar").textContent=(u.email||"M")[0].toUpperCase();$("todayLabel").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();await load()}
+async function enter(u){
+ if(!u||!u.id)return;
+ user={...u,offlineOnly:false};
+ if(window.FinanceOffline)FinanceOffline.rememberUser(user);
+ document.body.classList.remove("demo-mode");
+ $("authScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("userEmail").textContent=u.email||"";
+ $("avatar").textContent=(u.email||"M")[0].toUpperCase();
+ $("todayLabel").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"}).toUpperCase();
+ await load();
+}
 function go(p){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));$(p+"Page").classList.remove("hidden");document.querySelectorAll(".nav-item[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===p));$("pageTitle").textContent=titles[p];$("app").querySelector(".sidebar").classList.remove("open");render();scrollTo({top:0,behavior:"smooth"})}
-async function load(){for(let [k,sort] of [["transactions","date"],["cards","created_at"],["installments","created_at"],["bills","due_date"],["goals","created_at"]]){let r=await db.from(k).select("*").order(sort,{ascending:k==="bills"});if(r.error){console.error(r.error);toast("Erro ao carregar dados. Confira se executou supabase/schema.sql.",true);return}rows[k]=r.data||[]}render()}
+async function load(){
+ if(!user||!user.id||!window.FinanceOffline)return;
+ try{
+  rows=await FinanceOffline.getRows(user.id);
+  render();
+  refreshSyncStatus();
+  const result=await FinanceOffline.load(user.id,db,!user.offlineOnly);
+  rows=result.rows||rows;
+  render();
+  refreshSyncStatus();
+  if(result.error&&!user.offlineOnly&&navigator.onLine){
+   console.warn("Sincronização financeira:",result.error);
+   toast("Algumas alterações ainda não sincronizaram. Confira sua conexão ou entre novamente.",true);
+  }
+ }catch(error){
+  console.error("Falha ao abrir dados locais:",error);
+  toast(error.message||"Não foi possível abrir os dados financeiros neste dispositivo.",true);
+ }
+}
 function monthly(){let m=$("monthFilter").value||month();return rows.transactions.filter(t=>(t.date||"").startsWith(m))}function sum(a){return a.reduce((s,x)=>s+Number(x.amount||0),0)}function group(a){let g={};a.forEach(x=>g[x.category||"Outros"]=(g[x.category||"Outros"]||0)+Number(x.amount));return Object.entries(g).sort((a,b)=>b[1]-a[1])}
 function bars(g,limit=99){let max=g[0]?.[1]||1;return g.length?g.slice(0,limit).map(([n,v])=>'<div class="category-line"><span class="cat-name">'+esc(n)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+(v/max*100)+'%"></div></div><strong>'+fmt(v)+'</strong></div>').join(""):'<div class="empty-state">Seus gastos aparecerão aqui quando você registrar lançamentos.</div>'}
 function render(){dashboard();renderTransactions();renderCards();renderInstallments();renderBills();renderGoals();reports()}
@@ -142,8 +251,25 @@ function renderGoals(){$("goalsList").innerHTML=rows.goals.length?rows.goals.map
 function reports(){let a=monthly(),inc=sum(a.filter(x=>x.type==="income")),exp=sum(a.filter(x=>x.type==="expense")),g=group(a.filter(x=>x.type==="expense"));$("savingRate").textContent=inc?Math.round((inc-exp)/inc*100)+"%":"—";$("topCategory").textContent=g[0]?.[0]||"—";$("reportCategories").innerHTML=bars(g)}
 function actions(root){root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>open(b.dataset.edit,find(b.dataset.edit,b.dataset.id)));root.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>remove(b.dataset.del,b.dataset.id))}
 function find(k,id){return rows[tables[k]].find(x=>x.id===id)}
-async function remove(k,id){if(!confirm("Excluir este registro? Essa ação não pode ser desfeita."))return;let r=await db.from(tables[k]).delete().eq("id",id);if(r.error)return toast(r.error.message,true);toast("Registro excluído.");load()}
-async function update(table,id,p){let r=await db.from(table).update(p).eq("id",id);if(r.error)return toast(r.error.message,true);toast("Atualizado.");load()}
+async function remove(k,id){
+ if(!confirm("Excluir este registro? Essa ação não pode ser desfeita."))return;
+ if(!user||!window.FinanceOffline)return toast("Entre na sua conta para alterar seus dados.",true);
+ try{
+  await FinanceOffline.remove(user.id,db,tables[k],id,!user.offlineOnly);
+  rows=await FinanceOffline.getRows(user.id);
+  render();refreshSyncStatus();
+  toast(navigator.onLine&&!user.offlineOnly?"Registro excluído.":"Excluído neste aparelho; será sincronizado ao reconectar.");
+ }catch(error){toast(error.message||"Não foi possível excluir o registro.",true)}
+}
+async function update(table,id,p){
+ if(!user||!window.FinanceOffline)return toast("Entre na sua conta para alterar seus dados.",true);
+ try{
+  await FinanceOffline.update(user.id,db,table,id,p,!user.offlineOnly);
+  rows=await FinanceOffline.getRows(user.id);
+  render();refreshSyncStatus();
+  toast(navigator.onLine&&!user.offlineOnly?"Atualizado.":"Alteração salva neste aparelho para sincronizar depois.");
+ }catch(error){toast(error.message||"Não foi possível atualizar.",true)}
+}
 function field(n,l,t="text",o={}){let c;if(t==="select")c='<select name="'+n+'" '+(o.required?"required":"")+'>'+o.options.map(x=>'<option value="'+esc(x.value)+'">'+esc(x.label)+'</option>').join("")+'</select>';else if(t==="textarea")c='<textarea name="'+n+'" rows="3"></textarea>';else c='<input name="'+n+'" type="'+t+'" '+(o.required?"required":"")+(o.min!==undefined?' min="'+o.min+'"':"")+(o.step?' step="'+o.step+'"':"")+(o.placeholder?' placeholder="'+esc(o.placeholder)+'"':"")+'>';return '<div class="form-field'+(o.full?" full-field":"")+'"><label>'+l+'</label>'+c+'</div>'}
 function open(k,rec=null){edit=rec;kind=k;msg("formMessage","");let f=[],add=(...a)=>f.push(field(...a)),sel=a=>a.map(x=>({value:x,label:x}));if(k==="transaction"){add("type","Tipo","select",{required:true,options:[{value:"expense",label:"Despesa"},{value:"income",label:"Entrada"}]});add("description","Descrição","text",{required:true});add("amount","Valor (R$)","number",{required:true,min:"0.01",step:"0.01"});add("category","Categoria","select",{options:sel(cats)});add("date","Data","date",{required:true});add("payment_method","Forma de pagamento","select",{options:sel(["Pix","Dinheiro","Débito","Crédito","Transferência","Outro"])});add("notes","Observações","textarea",{full:true})}
 if(k==="card"){add("name","Nome do cartão","text",{required:true});add("bank","Instituição / banco","text",{placeholder:"Ex.: Nubank, Itaú, Inter..."});add("network","Bandeira do cartão","select",{required:true,options:[{value:"Visa",label:"Visa"},{value:"Mastercard",label:"Mastercard"},{value:"Elo",label:"Elo"},{value:"Hipercard",label:"Hipercard"},{value:"American Express",label:"American Express"},{value:"Outra",label:"Outra"}]});add("last_four","Últimos 4 dígitos","text",{placeholder:"Opcional"});add("limit_amount","Limite total (R$)","number",{min:"0",step:"0.01"});add("closing_day","Dia de fechamento","number",{min:"1",step:"1"});add("due_day","Dia de vencimento","number",{min:"1",step:"1"})}
@@ -153,7 +279,45 @@ if(k==="goal"){add("name","Nome da meta","text",{required:true});add("target_amo
 if(k==="contribution"){add("amount","Quanto você guardou? (R$)","number",{required:true,min:"0.01",step:"0.01"});f.push('<p class="muted full-field">A contribuição será somada à meta “'+esc(rec.name)+'”.</p>')}
 $("modalTitle").textContent=({transaction:rec?"Editar lançamento":"Novo lançamento",card:rec?"Editar cartão":"Novo cartão",installment:rec?"Editar compra parcelada":"Nova compra parcelada",bill:rec?"Editar conta":"Nova conta",goal:rec?"Editar meta":"Nova meta",contribution:"Registrar economia"})[k];$("modalFields").innerHTML=f.join("");let form=$("editorForm");if(rec)for(let [n,v] of Object.entries(rec)){let el=form.elements.namedItem(n);if(el)el.value=v??""}if(k==="transaction"&&!rec){form.elements.date.value=day();form.elements.type.value="expense";form.elements.category.value="Outros"}if(k==="bill"&&!rec){form.elements.due_date.value=day();form.elements.paid.value="false"}if(k==="installment"&&!rec){form.elements.purchase_date.value=day();form.elements.paid_installments.value="0";form.elements.card_id.value=rows.cards[0]?.id||""}if(k==="goal"&&!rec)form.elements.saved_amount.value="0";$("modalBackdrop").classList.remove("hidden")}
 function close(){$("modalBackdrop").classList.add("hidden");edit=null;kind=null}
-async function save(e){e.preventDefault();if(!kind)return;let v=Object.fromEntries(new FormData(e.target).entries()),k=kind,table=tables[k],p={},num=n=>v[n]===""||v[n]===undefined?null:Number(v[n]);if(k==="transaction")p={type:v.type,description:v.description.trim(),amount:num("amount"),category:v.category||"Outros",date:v.date,payment_method:v.payment_method||null,notes:v.notes||null};if(k==="card")p={name:v.name.trim(),bank:v.bank?.trim()||null,network:v.network||"Visa",last_four:v.last_four?.trim()||null,limit_amount:num("limit_amount"),closing_day:num("closing_day"),due_day:num("due_day")};if(k==="installment"){if(!rows.cards.some(c=>c.id===v.card_id))return msg("formMessage","Cadastre um cartão antes de adicionar parcelas.");p={description:v.description.trim(),card_id:v.card_id,total_amount:num("total_amount"),installments_count:num("installments_count"),paid_installments:num("paid_installments"),purchase_date:v.purchase_date};if(p.paid_installments>p.installments_count)return msg("formMessage","As parcelas pagas não podem exceder o total.")}if(k==="bill")p={name:v.name.trim(),amount:num("amount"),due_date:v.due_date,category:v.category||"Outros",paid:v.paid==="true",notes:v.notes||null};if(k==="goal")p={name:v.name.trim(),target_amount:num("target_amount"),saved_amount:num("saved_amount"),target_date:v.target_date||null,notes:v.notes||null};if(k==="contribution"){let amount=num("amount");if(!amount||amount<=0)return msg("formMessage","Informe um valor maior que zero.");let r=await db.from("goals").update({saved_amount:Number(edit.saved_amount)+amount}).eq("id",edit.id);if(r.error)return msg("formMessage",r.error.message);close();toast("Economia registrada!");return load()}let btn=e.submitter;btn.disabled=true;let r=edit?await db.from(table).update(p).eq("id",edit.id):await db.from(table).insert(p);btn.disabled=false;if(r.error)return msg("formMessage",r.error.message);close();toast(edit?"Alterações salvas.":"Registro adicionado.");load()}
+async function save(e){
+ e.preventDefault();
+ if(!kind)return;
+ if(!user||!window.FinanceOffline)return msg("formMessage","Entre na sua conta para salvar dados.");
+ let v=Object.fromEntries(new FormData(e.target).entries()),k=kind,table=tables[k],p={},num=n=>v[n]===""||v[n]===undefined?null:Number(v[n]);
+ if(k==="transaction")p={type:v.type,description:v.description.trim(),amount:num("amount"),category:v.category||"Outros",date:v.date,payment_method:v.payment_method||null,notes:v.notes||null};
+ if(k==="card")p={name:v.name.trim(),bank:v.bank?.trim()||null,network:v.network||"Visa",last_four:v.last_four?.trim()||null,limit_amount:num("limit_amount"),closing_day:num("closing_day"),due_day:num("due_day")};
+ if(k==="installment"){
+  if(!rows.cards.some(c=>c.id===v.card_id))return msg("formMessage","Cadastre um cartão antes de adicionar parcelas.");
+  p={description:v.description.trim(),card_id:v.card_id,total_amount:num("total_amount"),installments_count:num("installments_count"),paid_installments:num("paid_installments"),purchase_date:v.purchase_date};
+  if(p.paid_installments>p.installments_count)return msg("formMessage","As parcelas pagas não podem exceder o total.");
+ }
+ if(k==="bill")p={name:v.name.trim(),amount:num("amount"),due_date:v.due_date,category:v.category||"Outros",paid:v.paid==="true",notes:v.notes||null};
+ if(k==="goal")p={name:v.name.trim(),target_amount:num("target_amount"),saved_amount:num("saved_amount"),target_date:v.target_date||null,notes:v.notes||null};
+ if(k==="contribution"){
+  let amount=num("amount");
+  if(!amount||amount<=0)return msg("formMessage","Informe um valor maior que zero.");
+  try{
+   await FinanceOffline.update(user.id,db,"goals",edit.id,{saved_amount:Number(edit.saved_amount)+amount},!user.offlineOnly);
+   close();rows=await FinanceOffline.getRows(user.id);render();refreshSyncStatus();
+   toast(navigator.onLine&&!user.offlineOnly?"Economia registrada!":"Economia salva neste aparelho; sincronizará ao reconectar.");
+  }catch(error){msg("formMessage",error.message||"Não foi possível registrar a economia.");}
+  return;
+ }
+ let btn=e.submitter;
+ if(btn)btn.disabled=true;
+ try{
+  const id=edit?.id||undefined;
+  const record={...(edit||{}),...p,...(id?{id}: {})};
+  await FinanceOffline.save(user.id,db,table,record,!edit,!user.offlineOnly);
+  close();
+  rows=await FinanceOffline.getRows(user.id);
+  render();refreshSyncStatus();
+  toast(navigator.onLine&&!user.offlineOnly?"Registro salvo.":"Salvo neste aparelho; será sincronizado quando houver internet.");
+ }catch(error){
+  console.error("Falha ao salvar localmente:",error);
+  msg("formMessage",error.message||"Não foi possível salvar neste aparelho.");
+ }finally{if(btn)btn.disabled=false}
+}
 // O botão de demonstração usa delegação de eventos para continuar funcionando mesmo se
 // algum componente opcional da tela de login causar erro durante a inicialização.
 document.addEventListener("click",e=>{const b=e.target.closest("#demoBtn");if(!b)return;e.preventDefault();try{enterDemo()}catch(err){console.error("Falha ao abrir a demonstração:",err);const m=$("authMessage");if(m)m.textContent="Não foi possível abrir a demonstração. Atualize a página e tente novamente."}},true);
