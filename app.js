@@ -4,6 +4,19 @@ let db,user,rows={transactions:[],cards:[],installments:[],bills:[],goals:[]},ed
 function msg(id,s){$(id).textContent=s||""}function toast(s,err=false){let e=$("toast");e.textContent=s;e.classList.toggle("error",err);e.classList.remove("hidden");setTimeout(()=>e.classList.add("hidden"),3500)}
 function init(){
  if($("monthFilter"))$("monthFilter").value=month();
+ const passwordInput=$("password"),togglePassword=$("togglePassword");
+ if(passwordInput&&togglePassword){
+  togglePassword.addEventListener("click",()=>{
+   const show=passwordInput.type==="password";
+   passwordInput.type=show?"text":"password";
+   togglePassword.setAttribute("aria-pressed",String(show));
+   togglePassword.setAttribute("aria-label",show?"Ocultar senha":"Mostrar senha");
+   togglePassword.title=show?"Ocultar senha":"Mostrar senha";
+   togglePassword.innerHTML=show
+    ?'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c6.4 0 10 7 10 7a16 16 0 01-3.1 3.8"/><path d="M6.2 6.2C3.6 8 2 12 2 12s3.6 7 10 7c1.4 0 2.7-.3 3.8-.8"/></svg>'
+    :'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  });
+ }
  const configured=!!(window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY);
  if(configured)db=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
  else {msg("authMessage","Você pode experimentar a demonstração sem criar uma conta.");["signInBtn","signUpBtn","resetBtn"].forEach(id=>$(id).disabled=true)}
