@@ -7,46 +7,216 @@
 <link rel="icon" href="favicon.svg?v=20261020-1" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261020-7">
+<link rel="stylesheet" href="style.css?v=20261020-8">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="intro-critical-css">
-#brandIntro{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;background:#f8f6ef;color:#2d342f;font-family:Manrope,"DM Sans",system-ui,sans-serif}
-#brandIntro .intro-content{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;max-width:92vw}
-#brandIntro .intro-symbol{width:100px;height:100px;overflow:visible;color:#328266}
+#brandIntro{--intro-green:#328266;--intro-deep:#21664f;--intro-mint:#dff2e7;--intro-cream:#f8f6ef;position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 12% 12%,#e3f4e9 0,transparent 34%),radial-gradient(ellipse at 90% 86%,#fff0e5 0,transparent 28%),var(--intro-cream);color:#2d342f;font-family:Manrope,"DM Sans",system-ui,sans-serif;padding:24px}
+#brandIntro *{box-sizing:border-box}
+#brandIntro .intro-skip{position:absolute;right:clamp(16px,4vw,38px);top:clamp(14px,3vw,28px);z-index:3;border:1px solid #cbded1;background:#fffefa;color:#426b58;border-radius:999px;padding:9px 13px;font:600 11px "DM Sans",sans-serif;cursor:pointer}
+#brandIntro .intro-skip:hover{background:#e8f5ec}
+#brandIntro .intro-content{width:min(100%,930px);display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 0 8px}
+#brandIntro .intro-brand{display:flex;align-items:center;gap:9px;margin-bottom:14px;opacity:0;transform:translateY(7px);animation:introBrandIn .5s ease-out .1s forwards}
+#brandIntro .intro-symbol{width:37px;height:37px;overflow:visible;color:var(--intro-green)}
 #brandIntro .intro-ring{stroke-dasharray:100;stroke-dashoffset:100}
 #brandIntro .intro-chart{stroke-dasharray:100;stroke-dashoffset:100}
 #brandIntro .intro-dot{opacity:0;transform-box:fill-box;transform-origin:center}
-#brandIntro .intro-wordmark,#brandIntro .intro-tagline,#brandIntro .intro-continue{opacity:0;transform:translateY(12px)}
-#brandIntro .intro-wordmark{font-size:clamp(27px,5vw,38px);font-weight:800;letter-spacing:-1.4px;margin-top:20px}
-#brandIntro .intro-wordmark span{color:#328266}
-#brandIntro .intro-tagline{font-family:"DM Sans",system-ui,sans-serif;font-size:12px;letter-spacing:2px;color:#81867f;margin-top:12px}
-#brandIntro .intro-continue{font-family:"DM Sans",system-ui,sans-serif;margin-top:34px;border:0;border-radius:999px;background:#328266;color:#fff;padding:14px 23px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 10px 26px #32826633}
-#brandIntro .intro-continue:focus-visible{outline:3px solid #9fd5ba;outline-offset:4px}
-#brandIntro.is-playing .intro-dot{animation:introPop .38s cubic-bezier(.2,1.6,.4,1) .12s forwards}
-#brandIntro.is-playing .intro-ring{animation:introDraw .92s cubic-bezier(.6,0,.2,1) .35s forwards}
-#brandIntro.is-playing .intro-chart{animation:introDraw .6s ease-out 1.12s forwards}
-#brandIntro.is-playing .intro-wordmark{animation:introLift .55s ease-out 1.48s forwards}
-#brandIntro.is-playing .intro-tagline{animation:introLift .45s ease-out 1.7s forwards}
-#brandIntro.is-playing .intro-continue{animation:introLift .5s ease-out 1.92s forwards}
+#brandIntro .intro-brand-name{font-size:14px;font-weight:800;letter-spacing:-.5px}
+#brandIntro .intro-brand-name span{color:var(--intro-green)}
+#brandIntro .intro-kicker{font:700 9px "DM Sans",sans-serif;letter-spacing:2.5px;text-transform:uppercase;color:#65816e;margin:0 0 10px;opacity:0;animation:introTextIn .5s ease-out .5s forwards}
+#brandIntro .intro-title{font-size:clamp(26px,4.6vw,46px);line-height:1.08;letter-spacing:-1.8px;font-weight:800;margin:0;max-width:680px;opacity:0;transform:translateY(12px);animation:introTextIn .65s ease-out .65s forwards}
+#brandIntro .intro-title em{font-style:normal;color:var(--intro-green)}
+#brandIntro .intro-lede{font:400 clamp(12px,1.55vw,14px)/1.65 "DM Sans",sans-serif;color:#777f75;margin:12px 0 0;max-width:430px;opacity:0;transform:translateY(8px);animation:introTextIn .55s ease-out .95s forwards}
+#brandIntro .story-devices{width:100%;display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,34px);min-height:clamp(206px,29vw,315px);margin:clamp(15px,2.7vw,26px) auto 0;position:relative}
+#brandIntro .story-phone{width:clamp(108px,18vw,154px);aspect-ratio: .505;flex:0 0 auto;background:#27322d;padding:5px;border-radius:25px;box-shadow:0 20px 42px #234f3827;opacity:0;transform:translate(-30px,22px) rotate(-7deg) scale(.9);animation:introPhoneIn .8s cubic-bezier(.2,.8,.2,1) 1.45s forwards;position:relative;z-index:1}
+#brandIntro .phone-screen{height:100%;width:100%;border-radius:20px;overflow:hidden;background:#fffefa;display:flex;flex-direction:column;padding:7px 7px 8px}
+#brandIntro .phone-notch{width:34%;height:7px;background:#27322d;border-radius:0 0 8px 8px;margin:-7px auto 6px;flex-shrink:0}
+#brandIntro .phone-status{display:flex;justify-content:space-between;font:700 6px "DM Sans",sans-serif;color:#49554c;margin-bottom:8px}
+#brandIntro .phone-heading{display:flex;align-items:center;gap:5px;text-align:left;margin-bottom:8px}
+#brandIntro .phone-mini-mark{display:grid;place-items:center;width:19px;height:19px;background:var(--intro-green);border-radius:6px;color:#fff;font:800 10px Manrope}
+#brandIntro .phone-greeting{font:700 7px Manrope;color:#313b33;line-height:1.3}
+#brandIntro .phone-greeting small{display:block;font:400 5.5px "DM Sans",sans-serif;color:#849085;margin-top:2px}
+#brandIntro .phone-balance{background:linear-gradient(135deg,#328266,#21664f);border-radius:9px;padding:10px 8px;text-align:left;color:#fff}
+#brandIntro .phone-balance small{display:block;font:600 5px "DM Sans",sans-serif;letter-spacing:.7px;color:#dbf0e2}
+#brandIntro .phone-balance strong{display:block;font:800 clamp(10px,1.5vw,15px) Manrope;margin-top:5px;letter-spacing:-.3px}
+#brandIntro .phone-mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+#brandIntro .phone-mini-stat{background:#f0f7f0;border-radius:6px;padding:6px 5px;text-align:left;min-width:0}
+#brandIntro .phone-mini-stat:last-child{background:#fff1e9}
+#brandIntro .phone-mini-stat small{display:block;font:600 5px "DM Sans",sans-serif;color:#80887c}
+#brandIntro .phone-mini-stat b{display:block;font:800 8px Manrope;color:#31775b;margin-top:3px}
+#brandIntro .phone-mini-stat:last-child b{color:#c56d53}
+#brandIntro .phone-chart-title{font:700 6px Manrope;color:#455247;text-align:left;margin:9px 1px 5px}
+#brandIntro .phone-chart{display:flex;align-items:flex-end;justify-content:space-around;gap:4px;height:42px;padding:0 3px 3px;border-bottom:1px solid #e4eae1}
+#brandIntro .phone-chart span{flex:1;max-width:13px;height:var(--h);border-radius:3px 3px 1px 1px;background:linear-gradient(180deg,#72c49b,#328266);transform:scaleY(0);transform-origin:bottom;animation:introBars .55s cubic-bezier(.2,.8,.2,1) var(--delay) forwards}
+#brandIntro .phone-bottom-nav{display:flex;justify-content:space-around;margin-top:auto;padding-top:6px;color:#8c998c;font:600 6px "DM Sans",sans-serif}
+#brandIntro .phone-bottom-nav span:first-child{color:var(--intro-green)}
+#brandIntro .sync-bridge{width:clamp(15px,3vw,37px);flex:0 1 37px;position:relative;height:50px;opacity:0;transform:scaleX(.3);animation:introBridgeIn .55s ease-out 4.6s forwards}
+#brandIntro .sync-bridge:before{content:"";position:absolute;left:0;right:0;top:23px;border-top:2px dashed #8bbda0}
+#brandIntro .sync-bridge:after{content:"";position:absolute;right:0;top:18px;width:8px;height:8px;border-top:2px solid #328266;border-right:2px solid #328266;transform:rotate(45deg)}
+#brandIntro .bridge-dot{position:absolute;left:0;top:19px;width:10px;height:10px;border-radius:50%;background:#328266;box-shadow:0 0 0 4px #dff2e7;animation:introDotTravel 1.1s ease-in-out 5.05s infinite alternate}
+#brandIntro .story-laptop{width:clamp(190px,54vw,520px);flex:0 1 520px;opacity:0;transform:translate(38px,23px) scale(.91);animation:introLaptopIn .9s cubic-bezier(.2,.8,.2,1) 3.65s forwards;filter:drop-shadow(0 18px 26px #234f3817);min-width:0}
+#brandIntro .laptop-screen{aspect-ratio:1.63;background:#27322d;border:4px solid #27322d;border-bottom-width:7px;border-radius:9px 9px 5px 5px;padding:5px;overflow:hidden}
+#brandIntro .laptop-chrome{height:11px;display:flex;align-items:center;gap:3px;padding:0 2px 4px}
+#brandIntro .laptop-chrome i{display:block;width:4px;height:4px;border-radius:50%;background:#e8b4a0}
+#brandIntro .laptop-chrome i:nth-child(2){background:#e9cb72}
+#brandIntro .laptop-chrome i:nth-child(3){background:#80c79e}
+#brandIntro .laptop-url{margin-left:5px;background:#3d4941;border-radius:4px;flex:1;height:7px}
+#brandIntro .desktop-app{height:calc(100% - 11px);display:grid;grid-template-columns:19% 1fr;background:#faf9f3;overflow:hidden;border-radius:3px;text-align:left}
+#brandIntro .desktop-nav{background:#f0f3eb;padding:8px 6px;display:flex;flex-direction:column;gap:6px}
+#brandIntro .desktop-brand{font:800 8px Manrope;color:#328266;margin-bottom:5px}
+#brandIntro .desktop-nav-item{height:7px;border-radius:3px;background:#dfe7dd;width:85%}
+#brandIntro .desktop-nav-item.active{background:#bddbc7;width:100%}
+#brandIntro .desktop-main{padding:9px 10px;min-width:0}
+#brandIntro .desktop-head{display:flex;align-items:center;justify-content:space-between;gap:5px;font:800 clamp(7px,1vw,11px) Manrope;color:#344237;margin-bottom:7px}
+#brandIntro .desktop-period{font:500 5px "DM Sans",sans-serif;background:#e9f3e8;border-radius:4px;padding:3px 4px;color:#65806b;white-space:nowrap}
+#brandIntro .desktop-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#brandIntro .desktop-card{min-width:0;background:#fff;border:1px solid #e5e9df;border-radius:4px;padding:6px 5px}
+#brandIntro .desktop-card:first-child{background:#328266;border-color:#328266;color:white}
+#brandIntro .desktop-card small{display:block;font:500 5px "DM Sans",sans-serif;color:#7c887d;white-space:nowrap}
+#brandIntro .desktop-card:first-child small{color:#dff2e7}
+#brandIntro .desktop-card b{display:block;font:800 clamp(7px,1vw,11px) Manrope;color:#344237;margin-top:3px;white-space:nowrap}
+#brandIntro .desktop-card:first-child b{color:#fff}
+#brandIntro .desktop-bottom{display:grid;grid-template-columns:1.25fr 1fr;gap:6px;margin-top:7px}
+#brandIntro .desktop-chart-box,#brandIntro .desktop-bills{background:#fff;border:1px solid #e5e9df;border-radius:4px;padding:6px;min-width:0;min-height:50px}
+#brandIntro .desktop-section-title{font:800 6px Manrope;color:#47564a;margin-bottom:6px}
+#brandIntro .desktop-bars{height:47px;display:flex;align-items:flex-end;gap:5px;padding:0 2px;border-bottom:1px solid #e9ece4}
+#brandIntro .desktop-bars span{flex:1;border-radius:2px 2px 0 0;height:var(--h);background:linear-gradient(180deg,#82cba4,#328266);transform:scaleY(0);transform-origin:bottom;animation:introBars .6s cubic-bezier(.2,.8,.2,1) var(--delay) forwards}
+#brandIntro .desktop-bill-row{display:flex;justify-content:space-between;gap:3px;margin-top:7px;padding-bottom:4px;border-bottom:1px solid #edf0e9;font:500 5px "DM Sans",sans-serif;color:#728073}
+#brandIntro .desktop-bill-row b{color:#45584a;font-weight:700;white-space:nowrap}
+#brandIntro .laptop-base{height:7px;width:108%;margin-left:-4%;background:linear-gradient(180deg,#d9ded5,#adb8ac);border-radius:0 0 8px 8px;position:relative}
+#brandIntro .laptop-base:after{content:"";position:absolute;top:0;left:40%;width:20%;height:2px;background:#94a092;border-radius:0 0 3px 3px}
+#brandIntro .intro-summary{font:700 clamp(11px,1.5vw,14px)/1.45 "DM Sans",sans-serif;color:#5c7161;margin:13px 0 0;opacity:0;transform:translateY(8px);animation:introTextIn .5s ease-out 5.25s forwards}
+#brandIntro .intro-summary strong{color:var(--intro-deep)}
+#brandIntro .intro-actions{display:flex;align-items:center;justify-content:center;margin-top:18px;opacity:0;transform:translateY(8px);animation:introTextIn .55s ease-out 5.75s forwards}
+#brandIntro .intro-continue{border:0;border-radius:999px;background:linear-gradient(135deg,#328266,#21664f);color:#fff;padding:13px 23px;font:700 13px "DM Sans",sans-serif;cursor:pointer;box-shadow:0 9px 22px #32826630;transition:transform .2s,box-shadow .2s}
+#brandIntro .intro-continue:hover{transform:translateY(-2px);box-shadow:0 13px 28px #32826635}
+#brandIntro .intro-continue:focus-visible,#brandIntro .intro-skip:focus-visible{outline:3px solid #9fd5ba;outline-offset:3px}
+#brandIntro.is-playing .intro-ring{animation:introDraw .75s cubic-bezier(.6,0,.2,1) .12s forwards}
+#brandIntro.is-playing .intro-chart{animation:introDraw .55s ease-out .55s forwards}
+#brandIntro.is-playing .intro-dot{animation:introPop .35s cubic-bezier(.2,1.6,.4,1) .78s forwards}
+#brandIntro .intro-ring{stroke-dasharray:100;stroke-dashoffset:100}
+#brandIntro .intro-chart{stroke-dasharray:100;stroke-dashoffset:100}
 @keyframes introDraw{to{stroke-dashoffset:0}}
-@keyframes introPop{0%{opacity:0;transform:scale(0)}75%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
-@keyframes introLift{to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){#brandIntro .intro-ring,#brandIntro .intro-chart,#brandIntro .intro-dot,#brandIntro .intro-wordmark,#brandIntro .intro-tagline,#brandIntro .intro-continue{animation:none!important;opacity:1!important;transform:none!important}}
+@keyframes introPop{0%{opacity:0;transform:scale(0)}75%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes introBrandIn{to{opacity:1;transform:translateY(0)}}
+@keyframes introTextIn{to{opacity:1;transform:translateY(0)}}
+@keyframes introPhoneIn{to{opacity:1;transform:translate(0,0) rotate(-3deg) scale(1)}}
+@keyframes introLaptopIn{to{opacity:1;transform:translate(0,0) scale(1)}}
+@keyframes introBridgeIn{to{opacity:1;transform:scaleX(1)}}
+@keyframes introDotTravel{from{transform:translateX(0)}to{transform:translateX(21px)}}
+@keyframes introBars{to{transform:scaleY(1)}}
+#brandIntro.is-leaving{opacity:0;transition:opacity .35s ease}
+@media(max-width:560px){
+ #brandIntro{padding:18px 10px 14px;align-items:center}
+ #brandIntro .intro-content{padding-top:20px;padding-bottom:4px}
+ #brandIntro .intro-brand{margin-bottom:9px}
+ #brandIntro .intro-symbol{width:30px;height:30px}
+ #brandIntro .intro-kicker{font-size:8px;letter-spacing:1.8px;margin-bottom:8px}
+ #brandIntro .intro-title{font-size:clamp(25px,7.7vw,34px);letter-spacing:-1.1px}
+ #brandIntro .intro-lede{font-size:12px;max-width:315px;margin-top:8px}
+ #brandIntro .story-devices{gap:8px;min-height:0;margin-top:18px}
+ #brandIntro .story-phone{width:clamp(108px,31vw,137px);border-radius:22px;padding:4px}
+ #brandIntro .phone-screen{border-radius:18px;padding:6px}
+ #brandIntro .phone-notch{height:6px;margin-top:-6px;margin-bottom:5px}
+ #brandIntro .phone-balance{padding:8px 6px}
+ #brandIntro .phone-mini-stat{padding:5px 4px}
+ #brandIntro .phone-chart{height:32px}
+ #brandIntro .story-laptop{width:clamp(185px,57vw,250px);flex-basis:clamp(185px,57vw,250px)}
+ #brandIntro .laptop-screen{border-width:3px;border-bottom-width:5px;padding:3px;border-radius:6px 6px 3px 3px}
+ #brandIntro .laptop-chrome{height:8px;padding-bottom:3px}
+ #brandIntro .desktop-app{height:calc(100% - 8px)}
+ #brandIntro .desktop-nav{padding:5px 3px;gap:4px}
+ #brandIntro .desktop-main{padding:5px 4px}
+ #brandIntro .desktop-head{margin-bottom:4px}
+ #brandIntro .desktop-period{font-size:4px;padding:2px}
+ #brandIntro .desktop-cards{gap:2px}
+ #brandIntro .desktop-card{padding:4px 2px}
+ #brandIntro .desktop-card small{font-size:4px}
+ #brandIntro .desktop-card b{font-size:6px}
+ #brandIntro .desktop-bottom{gap:3px;margin-top:4px}
+ #brandIntro .desktop-chart-box,#brandIntro .desktop-bills{padding:3px;min-height:35px}
+ #brandIntro .desktop-section-title{font-size:4.5px;margin-bottom:3px}
+ #brandIntro .desktop-bars{height:30px;gap:2px}
+ #brandIntro .desktop-bill-row{font-size:4px;margin-top:4px;padding-bottom:2px}
+ #brandIntro .laptop-base{height:5px}
+ #brandIntro .sync-bridge{width:8px;flex-basis:8px}
+ #brandIntro .sync-bridge:before{border-top-width:1px}
+ #brandIntro .sync-bridge:after{width:6px;height:6px;top:20px}
+ #brandIntro .bridge-dot{width:7px;height:7px;top:20px;box-shadow:0 0 0 3px #dff2e7}
+ #brandIntro .intro-summary{font-size:11px;max-width:320px;margin-top:12px}
+ #brandIntro .intro-actions{margin-top:15px}
+ #brandIntro .intro-continue{padding:12px 19px;font-size:12px}
+ #brandIntro .intro-skip{top:8px;right:8px;padding:7px 10px;font-size:10px}
+}
+@media(max-height:650px) and (min-width:561px){
+ #brandIntro{padding:12px 22px}
+ #brandIntro .intro-brand{margin-bottom:5px}
+ #brandIntro .intro-title{font-size:29px}
+ #brandIntro .intro-lede{margin-top:6px}
+ #brandIntro .story-devices{min-height:180px;margin-top:9px}
+ #brandIntro .story-phone{width:95px}
+ #brandIntro .story-laptop{width:340px;flex-basis:340px}
+ #brandIntro .intro-summary{margin-top:6px}
+ #brandIntro .intro-actions{margin-top:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ #brandIntro .intro-ring,#brandIntro .intro-chart,#brandIntro .intro-dot,#brandIntro .intro-brand,#brandIntro .intro-kicker,#brandIntro .intro-title,#brandIntro .intro-lede,#brandIntro .story-phone,#brandIntro .story-laptop,#brandIntro .sync-bridge,#brandIntro .intro-summary,#brandIntro .intro-actions,#brandIntro .phone-chart span,#brandIntro .desktop-bars span{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
+}
 </style>
 </head>
 <body>
 
-<div id="brandIntro" role="dialog" aria-modal="true" aria-labelledby="introWordmark" aria-describedby="introTagline">
+<div id="brandIntro" role="dialog" aria-modal="true" aria-labelledby="introTitle" aria-describedby="introLede">
+  <button class="intro-skip" id="introSkip" type="button">Pular abertura ↗</button>
   <div class="intro-content">
-    <svg class="intro-symbol" viewBox="0 0 96 96" aria-hidden="true">
-      <circle class="intro-ring" cx="48" cy="48" r="36" pathLength="100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
-      <path class="intro-chart" d="M25 56 L39 43 L50 50 L70 29" pathLength="100" fill="none" stroke="#20b991" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle class="intro-dot" cx="70" cy="29" r="5" fill="#20b991"/>
-    </svg>
-    <div class="intro-wordmark" id="introWordmark">meu <span>financeiro.</span></div>
-    <div class="intro-tagline" id="introTagline">SEU DINHEIRO, COM MAIS CLAREZA</div>
-    <button class="intro-continue" id="introContinue" type="button">Entrar no meu espaço <span aria-hidden="true">↗</span></button>
+    <div class="intro-brand">
+      <svg class="intro-symbol" viewBox="0 0 96 96" aria-hidden="true">
+        <circle class="intro-ring" cx="48" cy="48" r="36" pathLength="100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        <path class="intro-chart" d="M25 56 L39 43 L50 50 L70 29" pathLength="100" fill="none" stroke="#20b991" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle class="intro-dot" cx="70" cy="29" r="6" fill="#20b991"/>
+      </svg>
+      <div class="intro-brand-name">meu <span>financeiro.</span></div>
+    </div>
+    <p class="intro-kicker">CLAREZA PARA CADA PASSO</p>
+    <h1 class="intro-title" id="introTitle">Seu dinheiro.<br><em>Seu espaço.</em></h1>
+    <p class="intro-lede" id="introLede">Uma visão simples e organizada da sua vida financeira — em qualquer tela.</p>
+
+    <div class="story-devices" aria-label="Prévia ilustrativa do Meu Financeiro no celular e no computador">
+      <div class="story-phone" aria-hidden="true">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="phone-status"><span>9:41</span><span>● ● ▰</span></div>
+          <div class="phone-heading"><span class="phone-mini-mark">m.</span><div class="phone-greeting">Olá, Nickolas<small>Seu resumo financeiro</small></div></div>
+          <div class="phone-balance"><small>SALDO DO MÊS</small><strong>R$ 3.170,00</strong></div>
+          <div class="phone-mini-stats"><div class="phone-mini-stat"><small>Entradas</small><b>R$ 3.650</b></div><div class="phone-mini-stat"><small>Despesas</small><b>R$ 480</b></div></div>
+          <div class="phone-chart-title">Seus gastos</div>
+          <div class="phone-chart"><span style="--h:40%;--delay:2.5s"></span><span style="--h:68%;--delay:2.6s"></span><span style="--h:50%;--delay:2.7s"></span><span style="--h:88%;--delay:2.8s"></span><span style="--h:58%;--delay:2.9s"></span><span style="--h:76%;--delay:3s"></span></div>
+          <div class="phone-bottom-nav"><span>◫ Início</span><span>↕ Registros</span><span>◎ Metas</span></div>
+        </div>
+      </div>
+
+      <div class="sync-bridge" aria-hidden="true"><span class="bridge-dot"></span></div>
+
+      <div class="story-laptop" aria-hidden="true">
+        <div class="laptop-screen">
+          <div class="laptop-chrome"><i></i><i></i><i></i><span class="laptop-url"></span></div>
+          <div class="desktop-app">
+            <div class="desktop-nav"><div class="desktop-brand">m. financeiro</div><span class="desktop-nav-item active"></span><span class="desktop-nav-item"></span><span class="desktop-nav-item"></span><span class="desktop-nav-item"></span><span class="desktop-nav-item"></span></div>
+            <div class="desktop-main">
+              <div class="desktop-head"><span>Visão geral</span><span class="desktop-period">Outubro · 2026</span></div>
+              <div class="desktop-cards"><div class="desktop-card"><small>Saldo do período</small><b>R$ 3.170</b></div><div class="desktop-card"><small>Entradas</small><b>R$ 3.650</b></div><div class="desktop-card"><small>Despesas</small><b>R$ 480</b></div></div>
+              <div class="desktop-bottom">
+                <div class="desktop-chart-box"><div class="desktop-section-title">Despesas por categoria</div><div class="desktop-bars"><span style="--h:45%;--delay:4.5s"></span><span style="--h:80%;--delay:4.6s"></span><span style="--h:57%;--delay:4.7s"></span><span style="--h:95%;--delay:4.8s"></span><span style="--h:68%;--delay:4.9s"></span><span style="--h:74%;--delay:5s"></span></div></div>
+                <div class="desktop-bills"><div class="desktop-section-title">Próximos vencimentos</div><div class="desktop-bill-row"><span>Internet</span><b>R$ 99</b></div><div class="desktop-bill-row"><span>Energia</span><b>R$ 148</b></div><div class="desktop-bill-row"><span>Streaming</span><b>R$ 34</b></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="laptop-base"></div>
+      </div>
+    </div>
+    <p class="intro-summary">Do celular ao computador: <strong>o mesmo espaço, adaptado à sua rotina.</strong></p>
+    <div class="intro-actions"><button class="intro-continue" id="introContinue" type="button">Entrar no meu espaço <span aria-hidden="true">↗</span></button></div>
   </div>
 </div>
 
@@ -114,21 +284,33 @@
 (function(){
   const intro = document.getElementById("brandIntro");
   if (!intro) return;
-  let seen = false;
-  try { seen = sessionStorage.getItem("mf-intro-seen") === "1"; } catch (_) {}
-  if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const finish = (remember) => {
+    if (remember) { try { sessionStorage.setItem("mf-intro-seen-v2","1"); } catch (_) {} }
     intro.remove();
+  };
+  const force = new URLSearchParams(location.search).has("intro");
+  let seen = false;
+  try { seen = sessionStorage.getItem("mf-intro-seen-v2") === "1"; } catch (_) {}
+  if ((seen && !force) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finish(false);
     return;
   }
   intro.classList.add("is-playing");
   const button = document.getElementById("introContinue");
+  const skip = document.getElementById("introSkip");
+  skip.addEventListener("click", () => finish(true));
   button.addEventListener("click", function(){
     if (intro.classList.contains("is-revealing")) return;
-    try { sessionStorage.setItem("mf-intro-seen", "1"); } catch (_) {}
+    try { sessionStorage.setItem("mf-intro-seen-v2","1"); } catch (_) {}
     intro.classList.add("is-revealing");
     button.disabled = true;
+    if (!window.CSS || !CSS.supports("mask-image","radial-gradient(circle, transparent 0, #000 1px)")) {
+      intro.classList.add("is-leaving");
+      setTimeout(() => intro.remove(), 380);
+      return;
+    }
     const start = performance.now();
-    const duration = 1050;
+    const duration = 1100;
     const radiusMax = Math.hypot(window.innerWidth, window.innerHeight) * 1.1;
     function reveal(now) {
       const p = Math.min(1, (now - start) / duration);
