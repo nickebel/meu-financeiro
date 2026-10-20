@@ -1,0 +1,80 @@
+name: Build Meu Financeiro for Android and Windows
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "index.html"
+      - "style.css"
+      - "app.js"
+      - "offline-store.js"
+      - "config.js"
+      - "pwa.js"
+      - "sw.js"
+      - "manifest.webmanifest"
+      - "favicon.svg"
+      - "app-icon.svg"
+      - "app-icon-maskable.svg"
+      - "icon-192.png"
+      - "icon-512.png"
+      - "package.json"
+      - "capacitor.config.json"
+      - "electron/**"
+      - "scripts/**"
+      - ".github/workflows/build-apps.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build Android app
+        run: |
+          npm install
+          npm run build:android
+          cd android
+          ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Meu-Financeiro-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  windows:
+    name: Windows installer and portable app
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build Windows app
+        run: |
+          npm install
+          npm run dist:windows
+      - name: Upload EXE files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Meu-Financeiro-Windows
+          path: |
+            release/*.exe
+          if-no-files-found: error
+          retention-days: 14
