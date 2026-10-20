@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f0e7"><meta name="description" content="Seu controle financeiro pessoal, simples e privado.">
+<title>Meu Financeiro</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="authScreen" class="auth-screen">
+  <section class="auth-card">
+    <div class="brand-mark">m.</div><p class="eyebrow">SUAS FINANÇAS, COM CALMA</p>
+    <h1>Cuide bem do<br><span>seu dinheiro.</span></h1>
+    <p class="muted">Um lugar simples para entender seu dinheiro e planejar os próximos passos.</p>
+    <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="voce@email.com"></div>
+    <div class="field"><label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" placeholder="Mínimo de 8 caracteres"></div>
+    <button id="signInBtn" class="btn primary full">Entrar</button><button id="signUpBtn" class="btn secondary full">Criar minha conta</button>
+    <button id="resetBtn" class="text-btn">Esqueci minha senha</button>
+    <p id="authMessage" class="message" role="status"></p>
+    <p class="tiny muted">Seus dados são privados e vinculados à sua conta.</p>
+  </section>
+</div>
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Meu Financeiro"><span class="brand-mark small">m.</span><span>meu financeiro</span></a>
+    <p class="nav-caption">MENU</p>
+    <nav id="navigation">
+      <button class="nav-item active" data-page="dashboard"><span>◫</span> Visão geral</button>
+      <button class="nav-item" data-page="transactions"><span>↕</span> Lançamentos</button>
+      <button class="nav-item" data-page="cards"><span>▤</span> Cartões e parcelas</button>
+      <button class="nav-item" data-page="bills"><span>◷</span> Contas a pagar</button>
+      <button class="nav-item" data-page="goals"><span>◎</span> Metas de economia</button>
+      <button class="nav-item" data-page="reports"><span>▥</span> Relatórios</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="privacy-note"><span class="privacy-dot"></span><div><strong>Espaço privado</strong><small>Seus dados, só seus.</small></div></div><button id="signOutBtn" class="nav-item signout"><span>↪</span> Sair da conta</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><button id="menuBtn" class="icon-btn mobile-menu" aria-label="Abrir menu">☰</button><div><p class="eyebrow" id="todayLabel">SEU RESUMO FINANCEIRO</p><h2 id="pageTitle">Visão geral</h2></div><div class="top-actions"><span class="avatar" id="avatar">M</span><span id="userEmail" class="user-email"></span></div></header>
+    <div class="content">
+      <section id="dashboardPage" class="page">
+        <div class="welcome-row"><div><h3>Olá! Vamos organizar as coisas.</h3><p class="muted">Um passo de cada vez já faz diferença.</p></div><button class="btn primary" id="quickAddBtn">＋ Novo lançamento</button></div>
+        <div class="filter-row"><label for="monthFilter">Período</label><input id="monthFilter" type="month"></div>
+        <div class="summary-grid">
+          <article class="summary-card balance-card"><div class="summary-top"><span>Saldo do período</span><span class="round-icon">↗</span></div><strong id="balanceValue">R$ 0,00</strong><small id="balanceHint">Entradas menos despesas</small></article>
+          <article class="summary-card"><div class="summary-top"><span>Entradas</span><span class="round-icon green">＋</span></div><strong id="incomeValue">R$ 0,00</strong><small class="muted">Dinheiro recebido</small></article>
+          <article class="summary-card"><div class="summary-top"><span>Despesas</span><span class="round-icon peach">−</span></div><strong id="expenseValue">R$ 0,00</strong><small class="muted">Dinheiro gasto</small></article>
+          <article class="summary-card"><div class="summary-top"><span>Contas pendentes</span><span class="round-icon sand">◷</span></div><strong id="pendingValue">R$ 0,00</strong><small id="pendingHint" class="muted">A vencer ou atrasadas</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Despesas por categoria</h3><p class="muted">Como seu dinheiro foi usado</p></div><span class="panel-symbol">◌</span></div><div id="categoryChart" class="category-chart"><div class="empty-state">Seus gastos aparecerão aqui quando você registrar lançamentos.</div></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Próximos vencimentos</h3><p class="muted">Contas que merecem atenção</p></div><button class="text-btn" data-goto="bills">Ver todas</button></div><div id="upcomingBills" class="compact-list"><div class="empty-state">Nenhuma conta cadastrada.</div></div></article>
+        </div>
+        <article class="panel"><div class="panel-heading"><div><h3>Últimos lançamentos</h3><p class="muted">Movimentações recentes</p></div><button class="text-btn" data-goto="transactions">Ver todos</button></div><div id="recentTransactions"></div></article>
+      </section>
+      <section id="transactionsPage" class="page hidden"><div class="section-intro"><div><h3>Seus lançamentos</h3><p class="muted">Registre e acompanhe cada entrada ou despesa.</p></div><button class="btn primary" id="addTransactionBtn">＋ Adicionar</button></div><div class="panel"><div class="toolbar"><input id="transactionSearch" placeholder="Buscar lançamento..." aria-label="Buscar lançamento"><select id="typeFilter" aria-label="Filtrar tipo"><option value="">Todos os tipos</option><option value="income">Entradas</option><option value="expense">Despesas</option></select></div><div id="transactionsTable"></div></div></section>
+      <section id="cardsPage" class="page hidden"><div class="section-intro"><div><h3>Cartões e parcelas</h3><p class="muted">Organize seus cartões e compras parceladas.</p></div><button class="btn primary" id="addCardBtn">＋ Novo cartão</button></div><div id="cardsList" class="cards-grid"></div><div class="section-intro sub-intro"><div><h3>Compras parceladas</h3><p class="muted">O valor mensal é calculado automaticamente.</p></div><button class="btn secondary" id="addInstallmentBtn">＋ Nova compra</button></div><div class="panel" id="installmentsTable"></div></section>
+      <section id="billsPage" class="page hidden"><div class="section-intro"><div><h3>Contas a pagar</h3><p class="muted">Acompanhe datas e marque o que já foi pago.</p></div><button class="btn primary" id="addBillBtn">＋ Nova conta</button></div><div class="panel"><div id="billsTable"></div></div></section>
+      <section id="goalsPage" class="page hidden"><div class="section-intro"><div><h3>Metas de economia</h3><p class="muted">Cada pequena contribuição aproxima você do objetivo.</p></div><button class="btn primary" id="addGoalBtn">＋ Nova meta</button></div><div id="goalsList" class="goals-grid"></div></section>
+      <section id="reportsPage" class="page hidden"><div class="section-intro"><div><h3>Relatórios</h3><p class="muted">Entenda seus hábitos financeiros sem complicação.</p></div></div><div class="summary-grid report-summary"><article class="summary-card"><span class="muted">Taxa de economia</span><strong id="savingRate">—</strong><small class="muted">Saldo ÷ entradas</small></article><article class="summary-card"><span class="muted">Maior categoria</span><strong id="topCategory">—</strong><small class="muted">No período selecionado</small></article></div><div class="panel"><div class="panel-heading"><div><h3>Resumo por categoria</h3><p class="muted">Despesas no período selecionado</p></div></div><div id="reportCategories"></div></div></section>
+    </div>
+    <footer>Feito para trazer mais clareza ao seu dia a dia. <span>Valores em reais (BRL).</span></footer>
+  </main>
+</div>
+<div id="modalBackdrop" class="modal-backdrop hidden"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><p class="eyebrow">MEU FINANCEIRO</p><h3 id="modalTitle">Novo lançamento</h3></div><button id="closeModalBtn" class="icon-btn" aria-label="Fechar">×</button></div><form id="editorForm"><div id="modalFields" class="form-grid"></div><div class="form-actions"><button type="button" id="cancelModalBtn" class="btn secondary">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div><p id="formMessage" class="message" role="status"></p></form></section></div>
+<div id="toast" class="toast" role="status"></div>
+<script src="app.js"></script>
+</body></html>
