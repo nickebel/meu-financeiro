@@ -1,13 +1,13 @@
 /* App shell PWA; nunca armazena respostas privadas do Supabase. */
-const CACHE_NAME = "meu-financeiro-shell-v3";
+const CACHE_NAME = "meu-financeiro-shell-v4";
 const BASE_URL = new URL("./", self.location.href);
 const SHELL_URLS = [
   BASE_URL.href,
   new URL("index.html", BASE_URL).href,
   new URL("style.css?v=20261020-13", BASE_URL).href,
-  new URL("app.js?v=20261020-9", BASE_URL).href,
+  new URL("app.js?v=20261020-10", BASE_URL).href,
   new URL("config.js", BASE_URL).href,
-  new URL("pwa.js?v=20261020-2", BASE_URL).href,
+  new URL("pwa.js?v=20261020-3", BASE_URL).href,
   new URL("offline-store.js?v=20261020-1", BASE_URL).href,
   new URL("manifest.webmanifest", BASE_URL).href,
   new URL("favicon.svg?v=20261020-1", BASE_URL).href,
