@@ -1,12 +1,13 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const sharp = require("sharp");
 
 const root = path.resolve(__dirname, "..");
 const out = path.join(root, "www");
 const files = [
   "index.html", "style.css", "app.js", "offline-store.js", "config.js",
   "pwa.js", "sw.js", "manifest.webmanifest", "favicon.svg",
-  "app-icon.svg", "app-icon-maskable.svg", "icon-192.png", "icon-512.png"
+  "app-icon.svg", "app-icon-maskable.svg"
 ];
 
 async function main() {
@@ -19,6 +20,11 @@ async function main() {
       throw new Error("Não foi possível copiar " + file + ": " + error.message);
     }
   }
+  // Generate valid PNG app icons from the tracked SVG source for each bundle.
+  const iconSvg = await fs.readFile(path.join(root, "app-icon.svg"));
+  await sharp(iconSvg).resize(192, 192).png().toFile(path.join(out, "icon-192.png"));
+  await sharp(iconSvg).resize(512, 512).png().toFile(path.join(out, "icon-512.png"));
+
   const packageSdk = path.join(root, "node_modules", "@supabase", "supabase-js", "dist", "umd", "supabase.js");
   try {
     await fs.copyFile(packageSdk, path.join(out, "supabase.min.js"));
