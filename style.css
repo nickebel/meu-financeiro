@@ -69,3 +69,7 @@
 .password-toggle:hover{background:#e7f3e9;color:#21664f}
 .password-toggle:focus-visible{outline:2px solid #328266;outline-offset:1px}
 .password-toggle svg{display:block;pointer-events:none}
+
+.password-toggle{touch-action:manipulation}
+.password-toggle:active{background:#dceee2}
+.password-input-wrap input{padding-right:48px}
