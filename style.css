@@ -73,3 +73,9 @@
 .password-toggle{touch-action:manipulation}
 .password-toggle:active{background:#dceee2}
 .password-input-wrap input{padding-right:48px}
+
+/* Instalação do Meu Financeiro como aplicativo (PWA) */
+.install-app-btn{display:flex;align-items:center;justify-content:center;gap:9px;border-color:#d0e2d5!important;background:#f7faf5!important;color:#276e55!important}
+.install-app-btn:hover{background:#e8f4eb!important;border-color:#bdd8c5!important}
+.install-app-btn svg{flex:0 0 auto}
+.install-help{padding:10px 12px;margin:9px 0 2px;line-height:1.65;background:#f2f6ee;border:1px solid #e1eadd;border-radius:10px;color:#5d6e60}
