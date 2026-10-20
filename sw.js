@@ -1,5 +1,5 @@
 /* App shell PWA; nunca armazena respostas privadas do Supabase. */
-const CACHE_NAME = "meu-financeiro-shell-v1";
+const CACHE_NAME = "meu-financeiro-shell-v2";
 const BASE_URL = new URL("./", self.location.href);
 const SHELL_URLS = [
   BASE_URL.href,
@@ -11,7 +11,9 @@ const SHELL_URLS = [
   new URL("manifest.webmanifest", BASE_URL).href,
   new URL("favicon.svg?v=20261020-1", BASE_URL).href,
   new URL("app-icon.svg", BASE_URL).href,
-  new URL("app-icon-maskable.svg", BASE_URL).href
+  new URL("app-icon-maskable.svg", BASE_URL).href,
+  new URL("icon-192.png", BASE_URL).href,
+  new URL("icon-512.png", BASE_URL).href
 ];
 
 self.addEventListener("install", event => {
