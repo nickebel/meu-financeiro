@@ -38,3 +38,13 @@ Aplicação pessoal de finanças em português (pt-BR), valores em reais (BRL), 
 - O saldo do painel é calculado como entradas menos despesas registradas no mês selecionado, não como saldo bancário sincronizado.
 - A chave anon/publishable pode aparecer no navegador, mas a segurança depende de políticas RLS corretas.
 - O Supabase JS e as fontes são carregados por CDN; é necessária conexão à internet.
+
+
+## 4. Instale como aplicativo (PWA)
+- O projeto inclui `manifest.webmanifest`, ícones, botão de instalação e service worker para o shell estático.
+- Depois que o GitHub Pages publicar as alterações, abra `https://nickebel.github.io/meu-financeiro/` em HTTPS.
+- **Android/Chrome:** use o botão “Instalar como aplicativo” no site, ou o menu do navegador → “Instalar app”.
+- **iPhone/iPad:** abra no Safari, toque em Compartilhar e escolha “Adicionar à Tela de Início”.
+- **Computador:** use o botão do site ou a opção de instalar no menu do Chrome/Edge, quando disponível.
+- O aplicativo instalado continua usando o Supabase na nuvem. É necessário ter internet para entrar, sincronizar e ler/gravar seus dados. O cache guarda apenas recursos estáticos do site, não os dados financeiros privados.
+- Isso instala o PWA pelo navegador; publicar em Google Play ou App Store exigiria uma etapa separada de empacotamento e publicação.
