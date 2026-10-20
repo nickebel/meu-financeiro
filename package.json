@@ -8,7 +8,7 @@
     "build:web": "node scripts/build-web.cjs",
     "build:win-icon": "node scripts/build-win-icon.cjs",
     "start:desktop": "npm run build:web && electron .",
-    "dist:windows": "npm run build:web && npm run build:win-icon && electron-builder --win --x64",
+    "dist:windows": "npm run build:web && npm run build:win-icon && electron-builder --win --x64 --publish never",
     "build:android": "npm run build:web && cap add android && node scripts/apply-android-branding.cjs && cap sync android"
   },
   "dependencies": {
