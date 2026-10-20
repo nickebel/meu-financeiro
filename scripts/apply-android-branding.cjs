@@ -4,7 +4,7 @@ const sharp = require("sharp");
 
 const root = path.resolve(__dirname, "..");
 const res = path.join(root, "android", "app", "src", "main", "res");
-const source = path.join(root, "icon-512.png");
+const source = path.join(root, "app-icon.svg");
 const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
 
 const foregroundSvg = Buffer.from(
@@ -26,8 +26,10 @@ async function main() {
   await sharp(foregroundSvg).png().toFile(path.join(highDensity, "ic_launcher_foreground.png"));
   const values = path.join(res, "values");
   await fs.mkdir(values, { recursive: true });
-  await fs.writeFile(path.join(values, "ic_launcher_colors.xml"),
-    '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#328266</color></resources>\n', "utf8");
+  // Capacitor já cria o recurso de fundo; sobrescreve o arquivo existente em vez de duplicar.
+  const backgroundPath = path.join(values, "ic_launcher_background.xml");
+  const backgroundXml = '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#328266</color></resources>\n';
+  await fs.writeFile(backgroundPath, backgroundXml, "utf8");
 
   const adaptiveFolder = path.join(res, "mipmap-anydpi-v26");
   await fs.mkdir(adaptiveFolder, { recursive: true });
