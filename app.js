@@ -17,6 +17,20 @@ function init(){
     :'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
   });
  }
+
+ const confirmInput=$("confirmPassword"),toggleConfirm=$("toggleConfirmPassword");
+ if(confirmInput&&toggleConfirm){
+  toggleConfirm.addEventListener("click",()=>{
+   const show=confirmInput.type==="password";
+   confirmInput.type=show?"text":"password";
+   toggleConfirm.setAttribute("aria-pressed",String(show));
+   toggleConfirm.setAttribute("aria-label",show?"Ocultar confirmação da senha":"Mostrar confirmação da senha");
+   toggleConfirm.title=show?"Ocultar confirmação da senha":"Mostrar confirmação da senha";
+   toggleConfirm.innerHTML=show
+    ?'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0112 5c6.4 0 10 7 10 7a16 16 0 01-3.1 3.8"/><path d="M6.2 6.2C3.6 8 2 12 2 12s3.6 7 10 7c1.4 0 2.7-.3 3.8-.8"/></svg>'
+    :'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  });
+ }
  const configured=!!(window.supabase&&C.SUPABASE_URL&&C.SUPABASE_ANON_KEY);
  if(configured)db=window.supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
  else {msg("authMessage","Você pode experimentar a demonstração sem criar uma conta.");["signInBtn","signUpBtn","resetBtn"].forEach(id=>$(id).disabled=true)}
