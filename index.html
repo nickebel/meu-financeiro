@@ -7,7 +7,7 @@
 <link rel="icon" href="favicon.svg?v=20261020-1" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261020-10">
+<link rel="stylesheet" href="style.css?v=20261020-11">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style id="intro-critical-css">
@@ -162,6 +162,98 @@
 @media(prefers-reduced-motion:reduce){
  #brandIntro .intro-ring,#brandIntro .intro-chart,#brandIntro .intro-dot,#brandIntro .intro-brand,#brandIntro .intro-kicker,#brandIntro .intro-title,#brandIntro .intro-lede,#brandIntro .story-phone,#brandIntro .story-laptop,#brandIntro .sync-bridge,#brandIntro .intro-summary,#brandIntro .intro-actions,#brandIntro .phone-chart span,#brandIntro .desktop-bars span{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
 }
+
+/* Revisão da abertura em celular: mostra um dispositivo por vez, com mais espaço. */
+@media(max-width:560px){
+ #brandIntro .story-devices{
+  display:block;position:relative;width:100%;height:clamp(218px,31vh,252px);
+  min-height:0;margin:14px auto 0;overflow:visible;flex:none
+ }
+ #brandIntro .story-phone{
+  position:absolute;left:50%;top:0;width:clamp(100px,29vw,116px);
+  transform:translate(-50%,15px) rotate(-4deg) scale(.94);
+  animation:introPhoneSwap 5.9s ease-in-out 0s both
+ }
+ #brandIntro .story-phone:after{
+  content:"NO CELULAR";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);
+  white-space:nowrap;font:700 8px "DM Sans",sans-serif;letter-spacing:1.6px;color:#65816e
+ }
+ #brandIntro .story-laptop{
+  position:absolute;left:50%;top:18px;width:min(91vw,330px);flex:none;
+  transform:translate(-50%,18px) scale(.92);
+  animation:introLaptopSwap 6.4s ease-out 0s both
+ }
+ #brandIntro .story-laptop:after{
+  content:"NO COMPUTADOR";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);
+  white-space:nowrap;font:700 8px "DM Sans",sans-serif;letter-spacing:1.6px;color:#65816e
+ }
+ #brandIntro .sync-bridge{display:none}
+ #brandIntro .phone-screen{padding:6px 6px 7px}
+ #brandIntro .phone-status{margin-bottom:7px}
+ #brandIntro .phone-heading{margin-bottom:7px}
+ #brandIntro .phone-balance{padding:8px 6px}
+ #brandIntro .phone-chart{height:31px}
+ #brandIntro .laptop-screen{border-width:4px;border-bottom-width:6px;padding:4px;border-radius:8px 8px 4px 4px}
+ #brandIntro .laptop-chrome{height:10px;padding-bottom:3px}
+ #brandIntro .desktop-app{height:calc(100% - 10px)}
+ #brandIntro .desktop-nav{padding:7px 5px;gap:5px}
+ #brandIntro .desktop-brand{font-size:7px}
+ #brandIntro .desktop-main{padding:7px 8px}
+ #brandIntro .desktop-head{font-size:8px;margin-bottom:6px}
+ #brandIntro .desktop-period{font-size:5px;padding:3px 4px}
+ #brandIntro .desktop-cards{gap:4px}
+ #brandIntro .desktop-card{padding:5px 4px}
+ #brandIntro .desktop-card small{font-size:5px}
+ #brandIntro .desktop-card b{font-size:8px}
+ #brandIntro .desktop-bottom{gap:5px;margin-top:6px}
+ #brandIntro .desktop-chart-box,#brandIntro .desktop-bills{padding:5px;min-height:45px}
+ #brandIntro .desktop-section-title{font-size:5.5px;margin-bottom:5px}
+ #brandIntro .desktop-bars{height:40px;gap:4px}
+ #brandIntro .desktop-bill-row{font-size:5px;margin-top:6px;padding-bottom:3px}
+ #brandIntro .intro-summary{font-size:11px;line-height:1.45;max-width:320px;margin-top:10px}
+ #brandIntro .intro-actions{margin-top:12px}
+}
+@keyframes introPhoneSwap{
+ 0%,23%{opacity:0;transform:translate(-50%,15px) rotate(-4deg) scale(.94)}
+ 32%,66%{opacity:1;transform:translate(-50%,0) rotate(-3deg) scale(1)}
+ 78%,100%{opacity:0;transform:translate(-50%,-8px) rotate(0) scale(.96)}
+}
+@keyframes introLaptopSwap{
+ 0%,60%{opacity:0;transform:translate(-50%,18px) scale(.92)}
+ 70%{opacity:.72;transform:translate(-50%,0) scale(.98)}
+ 78%,100%{opacity:1;transform:translate(-50%,0) scale(1)}
+}
+@media(max-width:380px){
+ #brandIntro{padding:12px 8px 10px}
+ #brandIntro .intro-content{padding-top:28px}
+ #brandIntro .intro-title{font-size:25px;letter-spacing:-.9px}
+ #brandIntro .intro-lede{font-size:11px;max-width:290px}
+ #brandIntro .story-devices{height:clamp(205px,30vh,225px);margin-top:10px}
+ #brandIntro .story-phone{width:100px}
+ #brandIntro .story-laptop{width:88vw;top:12px}
+ #brandIntro .intro-summary{font-size:10px;margin-top:7px;max-width:285px}
+ #brandIntro .intro-actions{margin-top:9px}
+ #brandIntro .intro-continue{padding:11px 18px}
+ #brandIntro .intro-skip{top:7px;right:7px}
+}
+@media(max-height:700px) and (max-width:560px){
+ #brandIntro{padding-top:10px;padding-bottom:9px}
+ #brandIntro .intro-content{padding-top:28px}
+ #brandIntro .intro-brand{margin-bottom:6px}
+ #brandIntro .intro-kicker{margin-bottom:5px}
+ #brandIntro .intro-title{font-size:clamp(24px,6vw,30px)}
+ #brandIntro .intro-lede{margin-top:6px;line-height:1.45}
+ #brandIntro .story-devices{height:clamp(190px,30vh,225px);margin-top:8px}
+ #brandIntro .story-phone{width:98px}
+ #brandIntro .story-laptop{width:min(86vw,300px);top:12px}
+ #brandIntro .intro-summary{margin-top:5px}
+ #brandIntro .intro-actions{margin-top:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ #brandIntro .story-phone,#brandIntro .story-laptop{animation:none!important;opacity:1!important;transform:translate(-50%,0)!important}
+ #brandIntro .phone-chart span,#brandIntro .desktop-bars span{animation:none!important;transform:scaleY(1)!important}
+}
+
 </style>
 </head>
 <body>
@@ -227,7 +319,7 @@
     <p class="muted" id="authSubtitle">Um lugar simples para entender seu dinheiro e planejar os próximos passos.</p>
     <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="voce@email.com"></div>
     <div class="field password-field"><label for="password">Senha</label><div class="password-input-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="Mínimo de 8 caracteres"><button id="togglePassword" class="password-toggle" type="button" aria-label="Mostrar senha" aria-pressed="false" title="Mostrar senha"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
-    <div id="confirmPasswordField" class="field hidden"><label for="confirmPassword">Confirmar senha</label><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Digite a senha novamente"></div>
+    <div id="confirmPasswordField" class="field password-field hidden"><label for="confirmPassword">Confirmar senha</label><div class="password-input-wrap"><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Digite a senha novamente"><button id="toggleConfirmPassword" class="password-toggle" type="button" aria-label="Mostrar confirmação da senha" aria-pressed="false" title="Mostrar confirmação da senha"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
     <button id="signInBtn" class="btn primary full" type="button">Entrar</button><button id="signUpBtn" class="btn secondary full" type="button">Criar minha conta</button><button id="backToLoginBtn" class="text-btn hidden" type="button">Já tenho conta? Entrar</button>
     <button id="resetBtn" class="text-btn">Esqueci minha senha</button>
     <div class="auth-divider"><span>ou</span></div>
@@ -329,5 +421,5 @@
 </script>
 
 <script src="config.js"></script>
-<script src="app.js?v=20261020-7"></script>
+<script src="app.js?v=20261020-8"></script>
 </body></html>
