@@ -20,6 +20,7 @@ create table if not exists public.cards (
  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
  name text not null check (length(trim(name)) between 1 and 100),
  bank text,
+ network text not null default 'Visa',
  last_four text check (last_four is null or last_four ~ '^[0-9]{4}$'),
  limit_amount numeric(12,2) check (limit_amount is null or limit_amount >= 0),
  closing_day integer check (closing_day is null or closing_day between 1 and 31),
@@ -27,6 +28,8 @@ create table if not exists public.cards (
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now()
 );
+-- Migração segura para bancos já criados antes da escolha de bandeira.
+alter table public.cards add column if not exists network text not null default 'Visa';
 create table if not exists public.installments (
  id uuid primary key default gen_random_uuid(),
  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
