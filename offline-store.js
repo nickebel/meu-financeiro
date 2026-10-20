@@ -178,7 +178,15 @@
         state.queue.push({ opId: uuid(), table, rowId, action: "delete", isCreate: false, payload: null, createdAt: now() });
       }
       state.rows[table] = state.rows[table].filter(row => row.id !== rowId);
-      // If a goal/card has child rows, let the database's existing relationship rules handle them.
+
+      // Deleting a card cascades to installments in Postgres. Mirror this locally and
+      // remove queued child upserts, otherwise an offline-created installment could
+      // later be sent for a card that no longer exists.
+      if (table === "cards") {
+        const childIds = new Set(state.rows.installments.filter(row => row.card_id === rowId).map(row => row.id));
+        state.rows.installments = state.rows.installments.filter(row => row.card_id !== rowId);
+        state.queue = state.queue.filter(op => !(op.table === "installments" && (childIds.has(op.rowId) || (op.action === "upsert" && op.payload && op.payload.card_id === rowId))));
+      }
       state.updatedAt = now();
       state.lastError = null;
       await writeState(state);
