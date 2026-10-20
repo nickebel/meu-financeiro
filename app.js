@@ -38,7 +38,7 @@ function init(){
   $("signInBtn").onclick=()=>auth("in");
   $("signUpBtn").onclick=()=>authMode==="up"?auth("up"):setAuthMode("up");
   $("backToLoginBtn").onclick=()=>setAuthMode("in");
-  $("resetBtn").onclick=async()=>{let email=$("email").value.trim();if(!email)return msg("authMessage","Informe seu e-mail.");let r=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});msg("authMessage",r.error?.message||"Se o e-mail estiver cadastrado, você receberá instruções.")};
+  $("resetBtn").onclick=async()=>{let email=$("email").value.trim();if(!email)return msg("authMessage","Informe seu e-mail.");let r=await db.auth.resetPasswordForEmail(email,{redirectTo:"https://nickebel.github.io/meu-financeiro/"});msg("authMessage",r.error?.message||"Se o e-mail estiver cadastrado, você receberá instruções.")};
   db.auth.onAuthStateChange((_e,s)=>setTimeout(()=>{
    if(s?.user)enter(s.user);
    else if(!navigator.onLine)restoreOfflineSession();
@@ -97,7 +97,7 @@ async function auth(mode){
  try{
   let r=mode==="in"
    ?await db.auth.signInWithPassword({email,password})
-   :await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+   :await db.auth.signUp({email,password,options:{emailRedirectTo:"https://nickebel.github.io/meu-financeiro/"}});
   if(r.error){
    const raw=r.error.message||"";
    let friendly=/invalid login credentials/i.test(raw)?"E-mail ou senha incorretos."
