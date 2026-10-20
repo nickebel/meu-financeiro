@@ -7,11 +7,12 @@ const res = path.join(root, "android", "app", "src", "main", "res");
 const source = path.join(root, "app-icon.svg");
 const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
 
+// O foreground usa o mesmo desenho do favicon, em escala segura para ícones adaptativos Android.
 const foregroundSvg = Buffer.from(
   '<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">' +
-  '<path d="M78 230 L158 158 L216 194 L310 94" fill="none" stroke="#dff2e7" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>' +
-  '<circle cx="310" cy="94" r="19" fill="#fffefa"/>' +
-  '<text x="78" y="332" font-family="Arial,sans-serif" font-size="165" font-weight="700" letter-spacing="-12" fill="#fffefa">m.</text>' +
+  '<path d="M227 154 L263 123 L294 144 L331 102" fill="none" stroke="#bcebd2" stroke-width="18.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '<circle cx="331" cy="102" r="15.6" fill="#fffefa"/>' +
+  '<text x="92" y="310" font-family="Arial,sans-serif" font-size="203" font-weight="700" letter-spacing="-10.4" fill="#fffefa">m.</text>' +
   '</svg>'
 );
 
@@ -40,6 +41,6 @@ async function main() {
     '</adaptive-icon>\n';
   await fs.writeFile(path.join(adaptiveFolder, "ic_launcher.xml"), adaptive, "utf8");
   await fs.writeFile(path.join(adaptiveFolder, "ic_launcher_round.xml"), adaptive, "utf8");
-  console.log("Ícones do Meu Financeiro aplicados ao projeto Android.");
+  console.log("Ícone do site aplicado ao projeto Android.");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

@@ -1,7 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#328266"/>
-  <circle cx="256" cy="256" r="169" fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="12"/>
-  <path d="M102 292 L200 205 L274 250 L389 136" fill="none" stroke="#bcebd2" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="389" cy="136" r="22" fill="#fffefa"/>
-  <text x="94" y="381" font-family="Arial,sans-serif" font-size="194" font-weight="700" letter-spacing="-15" fill="#fffefa">m.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="18" fill="#328266"/>
+  <path d="M35 18l7-6 6 4 7-8" fill="none" stroke="#bcebd2" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="55" cy="8" r="3" fill="#fffefa"/>
+  <text x="9" y="48" font-family="Arial,sans-serif" font-size="39" font-weight="700" letter-spacing="-2" fill="#fffefa">m.</text>
 </svg>
