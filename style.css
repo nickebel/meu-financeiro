@@ -30,7 +30,7 @@
 .category-line:nth-child(3n+2) .bar-fill{background:linear-gradient(90deg,#2bb695,#8bd8b6)}
 .category-line:nth-child(3n) .bar-fill{background:linear-gradient(90deg,#f19c79,#f2c26e)}
 .bank-card{background:linear-gradient(135deg,#31866a,#235f4c);color:#fff;border:0;box-shadow:0 12px 24px #27634c22}
-.bank-card .muted{color:#e2deff!important}
+.bank-card .muted{color:#e0f3e8!important}
 .bank-card .mini-btn{color:white;border-color:#ffffff55;background:#ffffff18}
 .goal-card,.goal-item{border-radius:18px}
 .tag{background:#e8f4ec;color:#286c50}
