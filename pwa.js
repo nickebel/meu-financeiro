@@ -4,7 +4,7 @@
   if (!installButton) return;
   let deferredPrompt = null;
   const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  const nativeShell = location.protocol === "financeapp:" || location.protocol === "capacitor:" || (location.hostname === "localhost" && !!window.Capacitor);
+  const nativeShell = document.querySelector('meta[name="mf-native-shell"]')?.content === "true" || location.protocol === "financeapp:" || location.protocol === "capacitor:" || (location.hostname === "localhost" && !!window.Capacitor);
   if (standalone || nativeShell) installButton.hidden = true;
 
   window.addEventListener("beforeinstallprompt", event => {
