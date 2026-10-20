@@ -5,7 +5,7 @@ Aplicação pessoal de finanças em português (pt-BR), valores em reais (BRL), 
 ## Arquivos
 - `index.html`, `style.css`, `app.js`: interface e aplicação.
 - `config.example.js`: modelo de configuração pública do Supabase.
-- `supabase/schema.sql`: tabelas, índices e políticas RLS.
+- `supabase/schema.sql`: tabelas, índices e políticas RLS; inclui migração para armazenar a bandeira do cartão.
 - `favicon.svg`: ícone do projeto.
 - `.nojekyll`: marcador para GitHub Pages.
 
@@ -14,9 +14,10 @@ Aplicação pessoal de finanças em português (pt-BR), valores em reais (BRL), 
 2. Abra **SQL Editor**, crie uma consulta, cole todo o conteúdo de `supabase/schema.sql` e execute.
 3. Em **Project Settings → API** (ou Connect), copie a Project URL e a chave pública `anon`/`publishable`.
 4. Crie um arquivo chamado `config.js` na raiz, copiando o conteúdo de `config.example.js` e substituindo os dois valores de exemplo.
-5. Em **Authentication → URL Configuration**, configure **Site URL** e **Redirect URLs** para `https://nickebel.github.io/meu-financeiro/`.
-6. Mantenha o provedor Email habilitado. Se a confirmação de e-mail estiver ativa, confirme o e-mail após criar a conta.
-7. Nunca coloque a chave `service_role`, senha do banco ou outros segredos no navegador.
+5. Se o banco já existia, execute novamente o conteúdo atualizado de `supabase/schema.sql`; a coluna de bandeira será adicionada sem apagar os cartões existentes.
+6. Em **Authentication → URL Configuration**, configure **Site URL** e **Redirect URLs** para `https://nickebel.github.io/meu-financeiro/`.
+7. Mantenha o provedor Email habilitado. Se a confirmação de e-mail estiver ativa, confirme o e-mail após criar a conta.
+8. Nunca coloque a chave `service_role`, senha do banco ou outros segredos no navegador.
 
 ## 2. Publique no GitHub Pages
 1. Abra **Settings → Pages** neste repositório.
