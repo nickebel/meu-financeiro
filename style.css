@@ -79,3 +79,11 @@
 .install-app-btn:hover{background:#e8f4eb!important;border-color:#bdd8c5!important}
 .install-app-btn svg{flex:0 0 auto}
 .install-help{padding:10px 12px;margin:9px 0 2px;line-height:1.65;background:#f2f6ee;border:1px solid #e1eadd;border-radius:10px;color:#5d6e60}
+
+/* Estado de conectividade e sincronização local/nuvem */
+.sync-status{display:inline-flex;align-items:center;gap:5px;max-width:230px;padding:7px 10px;border:1px solid #d8e9db;background:#eef7ef;color:#326d51;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-status.is-offline{background:#fff3e8;border-color:#f0d7c4;color:#a35d36}
+.sync-status.has-pending:not(.is-offline){background:#fff6df;border-color:#efdfad;color:#8b6a1e}
+@media(max-width:900px){.sync-status{max-width:150px;font-size:9px;padding:6px 8px}}
+@media(max-width:760px){.top-actions{gap:6px}.sync-status{max-width:125px;white-space:normal;line-height:1.2;text-align:center;padding:5px 7px;font-size:9px}.top-actions .avatar{width:32px;height:32px}}
+@media(max-width:380px){.sync-status{max-width:95px;font-size:8px;padding:4px 5px}.topbar{gap:6px}.topbar h2{font-size:18px}}
